@@ -67,17 +67,20 @@ def run_tool_loop(system: str, user: str, tools: list[dict], max_steps: int = 8,
     specs = [_spec(t) for t in tools]
     final = next((t["name"] for t in tools if t.get("final")), None)
     messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
-    step, empty = 0, 0
+    step, empties, retry_forced = 0, 0, False
     while step < max_steps + 2:
-        # force the final tool from step max_steps on, or after an empty reply (forced calls are more reliable); the 2 extra steps let a rejected submission be fixed
-        choice = {"type": "function", "function": {"name": final}} if final and (step + 1 >= max_steps or empty) else "auto"
+        # force the final tool on the last steps (the 2 extra steps let a rejected submission be fixed), and for the one retry
+        # that follows an empty reply (forced calls are more reliable); otherwise let the model choose its tools
+        choice = {"type": "function", "function": {"name": final}} if final and (step + 1 >= max_steps or retry_forced) else "auto"
         msg = _chat(messages, specs, choice, emit)
         if not msg.tool_calls:  # Gemini sometimes returns an empty/malformed reply: retry without using a step
-            empty += 1
-            if empty > 4:
+            empties += 1
+            retry_forced = True
+            if empties > 4:
                 break
             messages.append({"role": "user", "content": f"Continue using tools, and finish by calling {final}."})
             continue
+        retry_forced = False
         step += 1
         messages.append(msg.model_dump(exclude_none=True))
         for call in msg.tool_calls:

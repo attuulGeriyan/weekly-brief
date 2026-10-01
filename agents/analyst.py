@@ -36,7 +36,9 @@ metric is one of spend_usd, conversions, revenue_usd, cpa, roas, ctr, cvr, or "r
 (then channel is channel_a). Statements may only contain numbers that appear in that call's result.
 Data: channels {channels}; weeks {weeks} (week 1 is the earliest). Blended means all channels summed, then divided.
 Each tool result has a "call_id". When you submit a finding, set call_id to the call whose result contains its `value`.
-A statement is one factual sentence with numbers only: no guesses about causes."""
+A statement is one factual sentence with numbers only: no guesses about causes. For spend, conversions and revenue it must say
+how the number is aggregated: "total over weeks 7-12", "weekly average over weeks 7-12", "typical (median) week", or "in week 12".
+compare_periods and scan_changes level shifts report WEEKLY AVERAGES for these metrics; compute_kpi and compare_channels report totals."""
 
 PASS1 = """The latest week is {week}. You have no notes or context beyond the data.
 Find 5-8 findings. You must include: (a) blended results for the latest week versus the earlier weeks (use compare_periods
@@ -102,6 +104,10 @@ def run(state: RunState, pass_no: int = 1) -> list[Finding]:
             return {"error": f"invalid findings: {e.errors()[0]['loc']} {e.errors()[0]['msg']}"}
         if pass_no == 1 and not 5 <= len(sub.findings) <= 8:
             return {"error": f"submit 5-8 findings, got {len(sub.findings)}"}
+        if pass_no == 1 and not any(d.channel == "blended" and state.as_of_week in d.weeks for d in sub.findings):
+            before = [w for w in tools.WEEKS if w < state.as_of_week]
+            return {"error": f"not done yet: call compare_periods(channel='blended', weeks=[{state.as_of_week}], baseline_weeks={before}, "
+                             "metric='cpa') (or another metric) FIRST, then resubmit all findings including one blended finding that cites that call"}
         refs = [f.id for f in state.findings] + [n.note_id for n in state.notes]
         if pass_no == 2 and any(d.derived_from not in refs for d in sub.findings):
             return {"error": f"derived_from must be one of {refs}"}
@@ -133,7 +139,9 @@ def run(state: RunState, pass_no: int = 1) -> list[Finding]:
     findings = []
     for d in accepted:
         call = calls[d.pop("call_id")]
-        f = Finding(id=f"F{len(state.findings) + len(findings) + 1}", pass_no=pass_no, evidence=Evidence(**call), **d)
+        fact, _ = facts.match(d, call["tool"], call["args"], call["result"])  # the validated fact tells how the number was aggregated
+        f = Finding(id=f"F{len(state.findings) + len(findings) + 1}", pass_no=pass_no, evidence=Evidence(**call),
+                    aggregation=fact["agg"], baseline_aggregation=fact["agg_base"], **d)
         # readable proof in the trace (tool_result events are truncated): the finding next to the call that supports it
         emit("finding_recorded", id=f.id, kind=f.kind, channel=f.channel, weeks=f.weeks, metric=f.metric, value=f.value,
              baseline=f.baseline, change_pct=f.change_pct, statement=f.statement, derived_from=f.derived_from,

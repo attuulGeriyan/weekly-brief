@@ -3,6 +3,14 @@ from typing import Literal
 from pydantic import BaseModel
 
 
+class Target(BaseModel):  # one numeric goal in a target note
+    metric: Literal["cpa", "revenue_usd"]
+    op: Literal["<", ">"]
+    threshold: float
+    channel: str = "blended"
+    by: str | None = None  # ISO date the goal is due, if the note says
+
+
 class NoteMeta(BaseModel):  # built by index_notes (LLM extraction, once per note)
     note_id: str  # filename stem, e.g. "note_01_tracking"
     text: str  # verbatim note
@@ -11,6 +19,7 @@ class NoteMeta(BaseModel):  # built by index_notes (LLM extraction, once per not
     date_to: str | None  # ISO date it applies to (None = ongoing)
     kind: Literal["data_quality", "experiment", "campaign_change", "target"]
     rule: str | None  # machine-readable rule, if the note contains one
+    targets: list[Target] = []  # numeric goals (target notes only), one entry per goal
 
 
 class Evidence(BaseModel):
@@ -32,6 +41,8 @@ class Finding(BaseModel):
     statement: str  # one factual sentence, numbers only, no interpretation
     evidence: Evidence
     derived_from: str | None = None  # pass-2 finding or note this one answers
+    aggregation: str | None = None  # how `value` was aggregated: single_week | weekly_average | weekly_median | total | period_ratio
+    baseline_aggregation: str | None = None  # same for `baseline`
 
 
 class FollowUp(BaseModel):

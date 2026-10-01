@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 
 NUM_RE = re.compile(r"(?<![\w.])(\$)?(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(\s?%|x\b|k\b|K\b|M\b|\s+times\b)?")
-CITE_RE = re.compile(r"[\s)]*(?:[A-Za-z]+\s+){0,4}?((?:\[[FN]\d+(?:\s*,\s*[FN]\d+)*\][ \t]*)+)")
+CITE_RE = re.compile(r"(?:-[A-Za-z]+)?[\s)]*(?:[A-Za-z]+\s+){0,4}?((?:\[[FN]\d+(?:\s*,\s*[FN]\d+)*\][ \t]*)+)")
 BRACKET_RE = re.compile(r"\[([FN]\d+(?:\s*,\s*[FN]\d+)*)\]")
 _SEP = r"(?:[-–—]|to)"
 _BASE = re.compile(rf"\b[Ww]eeks?\s+(\d+)(?:\s*{_SEP}\s*(\d+))?")

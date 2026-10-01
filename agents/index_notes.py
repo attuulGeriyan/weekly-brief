@@ -8,7 +8,7 @@ from pydantic import BaseModel
 import llm
 import tools
 import trace
-from state import NoteMeta, RunState
+from state import NoteMeta, RunState, Target
 
 
 class NoteDraft(BaseModel):  # the part the LLM fills; id and verbatim text are added by code
@@ -17,6 +17,7 @@ class NoteDraft(BaseModel):  # the part the LLM fills; id and verbatim text are 
     date_to: str | None
     kind: Literal["data_quality", "experiment", "campaign_change", "target"]
     rule: str | None
+    targets: list[Target]
 
 
 SYSTEM = """You index short team notes for a marketing data system. Extract structured metadata from the note.
@@ -26,7 +27,11 @@ SYSTEM = """You index short team notes for a marketing data system. Extract stru
   Data weeks and the dates they cover: {weeks}.
 - kind: data_quality (the data is wrong), experiment (a test with an evaluation rule), campaign_change (a budget or campaign change), target (goals).
 - rule: if the note contains a decision rule or threshold, restate it as one machine-readable line
-  (e.g. "cut if cpa(X)/cpa(Y) > 1.5 over the test period"); otherwise null. Do not invent rules."""
+  (e.g. "cut if cpa(X)/cpa(Y) > 1.5 over the test period"); otherwise null. Do not invent rules.
+- targets: for notes that set numeric goals, ONE entry per distinct goal (a note with two goals gets two entries):
+  metric (cpa, or revenue_usd for revenue), op ("<" for under/below, ">" for above/over), threshold as a plain number ($25k = 25000),
+  channel ("blended" unless a channel is named), by = ISO date the goal is due (for a quarter or month, its last day), else null.
+  Use an empty list for notes without numeric goals."""
 
 
 def run(state: RunState) -> list[NoteMeta]:
@@ -42,6 +47,8 @@ def run(state: RunState) -> list[NoteMeta]:
             emit("warning", detail=f"dropped unknown channels {bad}")
         channels = [c for c in draft.channels if c in valid] or ["blended"]
         fields = {k: (None if v in ("null", "None", "") else v) for k, v in draft.model_dump().items()}  # Gemini sends "null" strings
+        fields["targets"] = [{**t, "by": None if t["by"] in ("null", "None", "") else t["by"]} for t in fields["targets"]
+                             if t["channel"] in valid]
         note = NoteMeta(note_id=os.path.splitext(os.path.basename(path))[0], text=text, **{**fields, "channels": channels})
         emit("note_indexed", **note.model_dump(exclude={"text"}))
         notes.append(note)

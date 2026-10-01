@@ -3,6 +3,7 @@ import re
 
 from pydantic import BaseModel
 
+import facts
 import llm
 import trace
 from state import Issue, RunState
@@ -15,7 +16,8 @@ class Draft(BaseModel):
 SYSTEM = """You write the weekly marketing brief for a head of marketing from verified findings and team notes.
 You never calculate, round further, or invent numbers. A code checker will verify every number against the data.
 
-Length: 250-330 words in total (a hard limit of 400 words is enforced). Be terse and pick only the findings that matter for decisions; do not cover every finding.
+Length: aim for 300 words; HARD LIMIT 380 words in total (a checker rejects more than 400 words). Spend the words on decisions:
+leave out small findings that change no decision, and do not repeat a baseline when the percentage change already conveys it. Be terse and pick only the findings that matter for decisions; do not cover every finding.
 Format: Markdown, exactly these sections as "## " headings, in order:
 Headline (2 sentences) / Last week vs the period / What the numbers mean (each anomaly with its note) /
 Decisions needed / Recommended actions (max 3 bullets, each on its own line starting with "- ") / Data caveats
@@ -28,6 +30,10 @@ Citation rules:
   Do not write counts as digits ("three actions" is fine, "3 actions" is not).
 - Write units the way the metric needs: $ for spend, revenue and CPA; x for ratios and ROAS ("1.92x [F9]", "0.78x [F3]");
   % for a change_pct, written as a positive size with a direction word ("12.7% higher [F3]").
+- For spend, conversions and revenue, the finding shows how the number was aggregated in [brackets]. Say it in the sentence:
+  "averaged $4,788 per week", "a weekly average of 107", "a total of $28,727", "in week 12". NEVER present a weekly
+  average as a total for the period.
+- CPA and ROAS are period figures (total spend / total conversions), so never say they were "averaged".
 - In the SAME sentence as each cited number, name the channel (or "blended"), the week(s) it covers, and the metric,
   and use direction words (higher/lower, up/down) that match the data.
 - When a finding has a note attachment with implication treat_as_invalid or do_not_judge_on_metric, cite that note's tag in
@@ -35,8 +41,10 @@ Citation rules:
   record week listed in the attachment and say the weekly data cannot isolate the affected days. Never call a number
   computed with excluded records "corrected" or "true"; say "excluding records ...".
 - For a decision-rule finding, state the outcome the rule implies against the threshold from the note, and make the
-  recommendation follow it. For target findings say whether the target was met, citing the target with its note tag.
+  recommendation follow it. Report EVERY target finding: the latest-week value, the target (note tag) and whether it was met. If an attachment says the
+  target period is incomplete, say so ("the month is incomplete: data ends ...").
 - Use "latest week" only for week {as_of}. Each paragraph or bullet on its own line.
+- "Last week vs the period": at most TWO sentences on blended results (the headline movers, e.g. CPA and revenue).
 - Do not explain causes that no note supports."""
 
 
@@ -52,9 +60,11 @@ def _span(weeks: list[int]) -> str:
 
 
 def _display(f) -> str:
-    parts = [f"value={_fmt(f.metric, f.value)}"]
+    """value/baseline/change with ready-made strings; for spend, conversions and revenue also how they were aggregated."""
+    tag = lambda agg: f" [{facts.AGG_LABEL[agg]}]" if f.metric in facts.ADDITIVE and agg in facts.AGG_LABEL else ""
+    parts = [f"value={_fmt(f.metric, f.value)}{tag(f.aggregation)}"]
     if f.baseline is not None:
-        parts.append(f"baseline={_fmt(f.metric, f.baseline)}")
+        parts.append(f"baseline={_fmt(f.metric, f.baseline)}{tag(f.baseline_aggregation)}")
     if f.change_pct is not None:
         parts.append(f"change={abs(f.change_pct):g}% {'higher' if f.change_pct > 0 else 'lower'}")
     return ", ".join(parts)

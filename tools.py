@@ -20,14 +20,16 @@ DERIVED = ["cpa", "roas", "ctr", "cvr"]
 KPI_ALIAS = {"spend_usd": "spend", "revenue_usd": "revenue"}  # compare_channels metric -> compute_kpi key
 
 
-def _div(a, b):
-    return round(float(a) / float(b), 2) if b else None
+def _r(x, n=2):
+    """Round for display only; every ratio and change is computed from unrounded numbers first."""
+    return None if x is None else round(float(x), n)
 
 
-def _derive(spend, impressions, clicks, conversions, revenue) -> dict:
-    """Derived metrics from summed base columns (so 'blended' is sum-then-divide)."""
-    return {"cpa": _div(spend, conversions), "roas": _div(revenue, spend),
-            "ctr": _div(clicks, impressions), "cvr": _div(conversions, clicks)}
+def _ratios(s) -> dict:
+    """Derived metrics from summed base columns (so 'blended' and any period are sum-then-divide)."""
+    d = lambda a, b: float(a) / float(b) if b else None
+    return {"cpa": d(s.spend_usd, s.conversions), "roas": d(s.revenue_usd, s.spend_usd),
+            "ctr": d(s.clicks, s.impressions), "cvr": d(s.conversions, s.clicks)}
 
 
 def _with_derived(df: pd.DataFrame) -> pd.DataFrame:
@@ -80,7 +82,8 @@ def get_weekly(channels: list[str] | None = None, weeks: list[int] | None = None
     return {"rows": rows}
 
 
-def compute_kpi(channel: str, weeks: list[int], exclude: list[list] = []) -> dict:
+def _kpi(channel: str, weeks: list[int], exclude) -> dict:
+    """Unrounded KPIs for a channel over weeks (minus excluded channel-weeks)."""
     exclude = _ex(exclude)
     if err := _check([channel], weeks, exclude, allow_blended=True):
         return err
@@ -92,59 +95,68 @@ def compute_kpi(channel: str, weeks: list[int], exclude: list[list] = []) -> dic
     if df.empty:
         return {"error": "no rows left after filtering", "valid": WEEKS}
     s = df[BASE].sum()
-    k = _derive(s.spend_usd, s.impressions, s.clicks, s.conversions, s.revenue_usd)
-    return {"spend": round(float(s.spend_usd), 2), "conversions": round(float(s.conversions), 2),
-            "revenue": round(float(s.revenue_usd), 2), "cpa": k["cpa"], "roas": k["roas"],
-            "weeks_used": sorted(int(w) for w in df["week"].unique()), "excluded": exclude}
+    k = _ratios(s)
+    return {"spend": float(s.spend_usd), "conversions": float(s.conversions), "revenue": float(s.revenue_usd),
+            "cpa": k["cpa"], "roas": k["roas"], "weeks_used": sorted(int(w) for w in df["week"].unique()), "excluded": exclude}
+
+
+def compute_kpi(channel: str, weeks: list[int], exclude: list[list] = []) -> dict:
+    """Totals over the weeks (spend, conversions, revenue) and period ratios (cpa, roas)."""
+    k = _kpi(channel, weeks, exclude)
+    return k if "error" in k else {key: (_r(v) if isinstance(v, float) else v) for key, v in k.items()}
 
 
 def compare_channels(channel_a: str, channel_b: str, weeks: list[int], metric: str = "cpa", exclude: list[list] = []) -> dict:
-    key, exclude = KPI_ALIAS.get(metric, metric), _ex(exclude)
-    a, b = compute_kpi(channel_a, weeks, exclude), compute_kpi(channel_b, weeks, exclude)
-    for r in (a, b):
-        if "error" in r:
-            return r
+    """Values of a metric for two channels over the same weeks (totals for spend/conversions/revenue) and their ratio."""
+    key = KPI_ALIAS.get(metric, metric)
+    a, b = _kpi(channel_a, weeks, exclude), _kpi(channel_b, weeks, exclude)
+    if err := next((r for r in (a, b) if "error" in r), None):
+        return err
     if key not in ("spend", "conversions", "revenue", "cpa", "roas"):
         return _bad("metric", metric, ["spend_usd", "conversions", "revenue_usd", "cpa", "roas"])
-    return {"a": a[key], "b": b[key], "ratio": _div(a[key], b[key]), "metric": metric}
+    return {"a": _r(a[key]), "b": _r(b[key]), "ratio": _r(a[key] / b[key]) if b[key] else None, "metric": metric}
 
 
 def compare_periods(channel: str, weeks: list[int], baseline_weeks: list[int], metric: str = "cpa", exclude: list[list] = []) -> dict:
-    """Like-for-like change of one period vs another: weekly averages for totals, plain ratios for cpa/roas."""
-    key, exclude = KPI_ALIAS.get(metric, metric), _ex(exclude)
-    a, b = compute_kpi(channel, weeks, exclude), compute_kpi(channel, baseline_weeks, exclude)
-    for r in (a, b):
-        if "error" in r:
-            return r
+    """Like-for-like change of one period vs another: weekly averages for spend/conversions/revenue, period ratios for cpa/roas."""
+    key = KPI_ALIAS.get(metric, metric)
+    a, b = _kpi(channel, weeks, exclude), _kpi(channel, baseline_weeks, exclude)
+    if err := next((r for r in (a, b) if "error" in r), None):
+        return err
     if key not in ("spend", "conversions", "revenue", "cpa", "roas"):
         return _bad("metric", metric, ["spend_usd", "conversions", "revenue_usd", "cpa", "roas"])
     va, vb = a[key], b[key]
     if key in ("spend", "conversions", "revenue"):  # totals -> per-week averages so period lengths don't matter
-        va, vb = round(va / len(a["weeks_used"]), 2), round(vb / len(b["weeks_used"]), 2)
-    change = round(100 * (va - vb) / vb, 1) if vb else None
-    return {"value": va, "baseline": vb, "change_pct": change, "metric": metric, "weeks": weeks, "baseline_weeks": baseline_weeks}
+        va, vb = va / len(a["weeks_used"]), vb / len(b["weeks_used"])
+    change = 100 * (va - vb) / vb if vb else None  # from unrounded inputs
+    return {"value": _r(va), "baseline": _r(vb), "change_pct": _r(change, 1), "metric": metric, "weeks": weeks, "baseline_weeks": baseline_weeks}
 
 
 def check_target(metric: str, week: int, op: str, threshold: float, channel: str = "blended", exclude: list[list] = []) -> dict:
     if metric not in ("cpa", "revenue_usd") or op not in ("<", ">"):
         return {"error": "metric must be cpa|revenue_usd and op must be < or >", "valid": ["cpa", "revenue_usd", "<", ">"]}
-    kpi = compute_kpi(channel, [week], _ex(exclude))
+    kpi = _kpi(channel, [week], exclude)
     if "error" in kpi:
         return kpi
     value = kpi["cpa"] if metric == "cpa" else kpi["revenue"]
     met = value is not None and (value < threshold if op == "<" else value > threshold)
-    return {"value": value, "threshold": threshold, "met": bool(met)}
+    return {"value": _r(value), "threshold": threshold, "met": bool(met)}
+
+
+def _block(g: pd.DataFrame, m: str):
+    """Value of metric m over a block of weekly rows: ratios are sum-then-divide (like compute_kpi), totals are weekly means."""
+    return _ratios(g[BASE].sum())[m] if m in DERIVED else float(g[m].mean())
 
 
 def scan_changes(metrics: list[str] = ["spend_usd", "conversions", "cpa"], z: float = 2.0, min_shift: float = 0.20, min_block: int = 3) -> dict:
-    """Candidates: single weeks far from the channel median (> z * MAD), and sustained level shifts."""
+    """Candidates: single weeks far from the channel median (> z * MAD), and sustained level shifts (later block vs earlier block)."""
     bad = [m for m in metrics if m not in BASE + DERIVED]
     if bad:
         return _bad("metric", bad, BASE + DERIVED)
     df = _with_derived(DF)
     out = []
     for ch, g in df.groupby("channel"):
-        g = g.sort_values("week")
+        g = g.sort_values("week").reset_index(drop=True)
         for m in metrics:
             s = g.set_index("week")[m].dropna()
             med = s.median()
@@ -152,48 +164,24 @@ def scan_changes(metrics: list[str] = ["spend_usd", "conversions", "cpa"], z: fl
             if mad > 0:
                 for wk, v in s.items():
                     if abs(v - med) > z * mad:
-                        out.append({"channel": ch, "weeks": [int(wk)], "metric": m, "value": round(float(v), 2),
-                                    "baseline": round(float(med), 2), "change_pct": round(float(100 * (v - med) / med), 1), "type": "outlier"})
-            best = None  # level shift: split point where later-block mean differs most from earlier-block mean
-            for k in range(min_block, len(s) - min_block + 1):
-                early, late = s.iloc[:k].mean(), s.iloc[k:].mean()
-                chg = (late - early) / early if early else 0
+                        out.append({"channel": ch, "weeks": [int(wk)], "metric": m, "value": _r(v), "baseline": _r(med),
+                                    "change_pct": _r(100 * (v - med) / med, 1), "type": "outlier"})
+            best = None  # level shift: the split point where the later block differs most from the earlier block
+            for k in range(min_block, len(g) - min_block + 1):
+                early, late = _block(g.iloc[:k], m), _block(g.iloc[k:], m)
+                chg = (late - early) / early if early and late is not None else 0
                 if abs(chg) > min_shift and (best is None or abs(chg) > abs(best[0])):
                     best = (chg, k, early, late)
             if best:
                 chg, k, early, late = best
-                out.append({"channel": ch, "weeks": [int(w) for w in s.index[k:]], "metric": m, "value": round(float(late), 2),
-                            "baseline": round(float(early), 2), "change_pct": round(float(100 * chg), 1), "type": "level_shift"})
+                out.append({"channel": ch, "weeks": [int(w) for w in g["week"].iloc[k:]], "metric": m, "value": _r(late),
+                            "baseline": _r(early), "change_pct": _r(100 * chg, 1), "type": "level_shift"})
     out.sort(key=lambda r: -abs(r["change_pct"]))
     return {"candidates": out}
 
 
-_S, _I = {"type": "string"}, {"type": "integer"}
-_CH = {**_S, "description": "a channel name, or 'blended' for all channels summed"}
-_WK = {"type": "array", "items": _I, "description": "week numbers"}
-_EX = {"type": "array", "description": "[channel, week] pairs to leave out, e.g. broken data",
-       "items": {"type": "array", "items": _S}}
-_MET = {"type": "array", "items": _S}
+from tool_specs import SPECS  # noqa: E402  (descriptions + JSON schemas the LLM sees)
 
-
-def _obj(desc, props, required):
-    return {"description": desc, "parameters": {"type": "object", "properties": props, "required": required}}
-
-
-TOOLS = {  # name -> {fn, description, parameters}; the LLM only ever sees these specs
-    "get_weekly": {"fn": get_weekly, **_obj("Raw weekly rows per channel/week for chosen metrics.",
-                   {"channels": {"type": "array", "items": _S}, "weeks": _WK, "metrics": _MET}, [])},
-    "compute_kpi": {"fn": compute_kpi, **_obj("Spend, conversions, revenue, CPA, ROAS summed over weeks (optionally excluding channel-weeks).",
-                    {"channel": _CH, "weeks": _WK, "exclude": _EX}, ["channel", "weeks"])},
-    "scan_changes": {"fn": scan_changes, **_obj("Deterministic list of outlier weeks and level shifts per channel: where to look.",
-                     {"metrics": _MET, "z": {"type": "number"}}, [])},
-    "compare_channels": {"fn": compare_channels, **_obj("Ratio of a metric (default cpa) between two channels over weeks.",
-                         {"channel_a": _CH, "channel_b": _CH, "weeks": _WK, "metric": _S, "exclude": _EX},
-                         ["channel_a", "channel_b", "weeks"])},
-    "compare_periods": {"fn": compare_periods, **_obj("Change of a metric in `weeks` vs `baseline_weeks` (weekly averages for spend/conversions/revenue_usd; cpa and roas as ratios). Returns value, baseline, change_pct.",
-                        {"channel": _CH, "weeks": _WK, "baseline_weeks": _WK, "metric": _S, "exclude": _EX},
-                        ["channel", "weeks", "baseline_weeks", "metric"])},
-    "check_target": {"fn": check_target, **_obj("Does a week's cpa or revenue_usd meet a threshold (op '<' or '>')?",
-                     {"metric": _S, "week": _I, "op": _S, "threshold": {"type": "number"}, "channel": _CH, "exclude": _EX},
-                     ["metric", "week", "op", "threshold"])},
-}
+TOOLS = {n: {"fn": fn, **SPECS[n]} for n, fn in (("get_weekly", get_weekly), ("compute_kpi", compute_kpi), ("scan_changes", scan_changes),
+                                                  ("compare_channels", compare_channels), ("compare_periods", compare_periods),
+                                                  ("check_target", check_target))}

@@ -5,7 +5,7 @@ import re
 import citations as cz
 import facts
 import tools
-from agents.context import affected_records
+from agents.context import affected_records, open_targets
 from agents.writer import render
 from state import Issue, Review, RunState
 
@@ -28,19 +28,19 @@ def _aliases(channel: str) -> list[str]:
 
 def _candidates(f) -> list[dict]:
     """Everything a citation of finding f may legitimately refer to: its own fields and its evidence call's facts."""
-    rows = [(f.channel, f.weeks, f.metric, f.value, f.baseline, f.change_pct)]
+    rows = [(f.channel, f.weeks, f.metric, f.value, f.baseline, f.change_pct, f.aggregation, f.baseline_aggregation)]
     if f.evidence.tool in ("compare_channels", "compare_periods", "check_target", "compute_kpi"):
-        rows += [(x["channel"], x["weeks"], x["metric"], x["value"], x["baseline"], x["change_pct"])
+        rows += [(x["channel"], x["weeks"], x["metric"], x["value"], x["baseline"], x["change_pct"], x["agg"], x["agg_base"])
                  for x in facts.facts_from(f.evidence.tool, f.evidence.args, f.evidence.result)]
     out = []
-    for ch, wk, metric, value, base, chg in rows:
+    for ch, wk, metric, value, base, chg, agg, agg_base in rows:
         delta = None if f.kind == "target" or base is None else value - base
         common = dict(channel=ch, weeks=sorted(wk), metric=metric, finding=f.id, base_weeks=f.evidence.args.get("baseline_weeks"),
-                      excluded=[w for _, w in f.evidence.args.get("exclude", [])],
+                      excluded=[w for _, w in f.evidence.args.get("exclude", [])], used=f.evidence.result.get("weeks_used"),
                       extra=f.evidence.args.get("metric", "cpa") if metric == "ratio" else None)
-        for role, expected, d in (("value", value, delta), ("baseline", base, delta), ("change", chg, chg)):
+        for role, expected, d, a in (("value", value, delta, agg), ("baseline", base, delta, agg_base), ("change", chg, chg, None)):
             if expected is not None:
-                out.append({**common, "role": role, "expected": expected, "delta": d})
+                out.append({**common, "role": role, "expected": expected, "delta": d, "agg": a})
     return out
 
 
@@ -51,7 +51,10 @@ def _allowed_weeks(sent: str, cands: dict, notes: dict) -> tuple[set, set]:
     for cid in cz.cited_ids(sent):
         for c in cands.get(cid, []):
             own.add(frozenset(c["weeks"]))
-            allowed |= {frozenset(c["weeks"])} | ({frozenset(c["base_weeks"])} if c["base_weeks"] else set()) | {frozenset([w]) for w in c["excluded"]}
+            if c["used"]:  # weeks that actually had data after exclusions
+                own.add(frozenset(c["used"]))
+                allowed.add(frozenset(c["used"]))
+            allowed |= {frozenset(c["weeks"])} | ({frozenset(c["base_weeks"])} if c["base_weeks"] else set()) | {frozenset([w]) for w in c["excluded"]} | ({frozenset(c["excluded"])} if c["excluded"] else set())
         if cid in notes:
             ws = {w for _, w in affected_records(notes[cid])}
             own.add(frozenset(ws))
@@ -83,10 +86,13 @@ def _problems(c: dict, t: cz.Num, text: str, sent: str, rel: int, weeks_ok: tupl
         out.append(f"[channel] the number is introduced as {named_before} but the finding is about '{c['channel']}'")
     elif not own and (c["channel"] != "blended" or others):
         out.append(f"[channel] expected '{c['channel']}' in the sentence" + (f", found {others}" if others else ""))
+    pat = facts.AGG_RE.get(c["agg"]) if m in facts.ADDITIVE else None  # aggregation: weekly average vs total
+    if pat and not re.search(pat, sent, re.I):
+        out.append(f"[aggregation] this {m} figure is a {facts.AGG_LABEL[c['agg']]}; the sentence must say so (e.g. 'per week', 'weekly average', 'total')")
     mentions = cz.weeks_in(sent)  # period
     if mentions:
         allowed, own = weeks_ok  # a value must be placed in its own weeks; only a baseline may name the baseline weeks instead
-        mine = [frozenset(c["weeks"])] + ([frozenset(c["base_weeks"])] if c["role"] == "baseline" and c["base_weeks"] else [])
+        mine = [frozenset(c["weeks"])] + ([frozenset(c["used"])] if c["used"] else []) + ([frozenset(c["base_weeks"])] if c["role"] == "baseline" and c["base_weeks"] else [])
         mentions = [frozenset([as_of]) if w == "LATEST" else w for w in mentions]
         ends = {min(a) for a in own if a} | {max(a) for a in own if a}  # "from week 7" / "through week 12" are fine
         fits = lambda w: w in allowed or (len(w) == 1 and next(iter(w)) in ends)
@@ -176,6 +182,25 @@ def _check_notes(state: RunState, draft: str) -> list[Issue]:
     return issues
 
 
+def _check_targets(state: RunState, draft: str) -> list[Issue]:
+    """Every target of a target note must have been computed, reported in the draft, and (if due later) flagged as incomplete."""
+    issues, cited = [], cz.cited_ids(draft)
+    for n in state.notes:
+        for t in n.targets:
+            fs = [f for f in state.findings if f.evidence.tool == "check_target" and f.evidence.args.get("metric") == t.metric
+                  and f.evidence.args.get("channel", "blended") == t.channel]
+            label = f"{n.note_id} target {t.metric} {t.op} {t.threshold:g}"
+            if not fs:
+                issues.append(Issue(kind="missing_note_caveat", detail=f"{label} was never computed"))
+            elif not any(f.id in cited for f in fs):
+                issues.append(Issue(kind="missing_note_caveat", detail=f"the draft never reports {label}; cite its finding {[f.id for f in fs]}"))
+            elif t in open_targets(n, state.as_of_week):
+                blocks = [b for b in cz.blocks(draft) if any(f.id in cz.cited_ids(b) for f in fs)]
+                if not any(re.search(r"incomplete|partial|not yet|remain|still", b, re.I) for b in blocks):
+                    issues.append(Issue(kind="missing_note_caveat", detail=f"{label} is due {t.by}, after the data ends; the paragraph reporting it must say the period is incomplete"))
+    return issues
+
+
 def _check_rules(state: RunState, draft: str) -> list[Issue]:
     ids = {n.note_id: f"N{i + 1}" for i, n in enumerate(state.notes)}
     notes = {n.note_id: n for n in state.notes}
@@ -191,7 +216,7 @@ def _check_rules(state: RunState, draft: str) -> list[Issue]:
                 continue
             thr = float(m["thr"])
             fired = {">": f.value > thr, ">=": f.value >= thr, "<": f.value < thr, "<=": f.value <= thr}[m["op"]]
-            mine = " ".join(b for b in cz.blocks(draft) if f.id in cz.cited_ids(b) or ids[a.note_id] in cz.cited_ids(b))
+            mine = " ".join(draft[x:y] for x, y in cz.sentences(draft) if {f.id, ids[a.note_id]} & cz.cited_ids(draft[x:y]))
             keeps, acts = KEEP_RE.findall(mine), ACTION_RE.findall(mine)
             if fired and keeps:
                 issues.append(Issue(kind="rule_outcome_mismatch", detail=f"rule '{rule}' fires (value {f.value} {m['op']} {thr}) but the draft says {keeps}"))
@@ -203,7 +228,7 @@ def _check_rules(state: RunState, draft: str) -> list[Issue]:
 
 
 def run(state: RunState, draft: str) -> Review:
-    issues = _check_numbers(state, draft) + _check_notes(state, draft) + _check_rules(state, draft)
+    issues = _check_numbers(state, draft) + _check_notes(state, draft) + _check_targets(state, draft) + _check_rules(state, draft)
     words = len(re.findall(r"[A-Za-z0-9$]\S*", render(draft, state)))  # the rendered brief is what gets delivered
     if not 200 <= words <= 400:
         issues.append(Issue(kind="length", detail=f"{words} words in the rendered brief; must be 200-400"

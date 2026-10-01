@@ -6,7 +6,7 @@ from pydantic import BaseModel
 import llm
 import tools
 import trace
-from state import Attachment, Finding, NoteMeta, RunState
+from state import Attachment, Finding, FollowUp, NoteMeta, RunState
 
 
 class ContextOut(BaseModel):
@@ -26,7 +26,7 @@ implication is one of:
 follow_ups are tool calls that compute what the note requires. Rules:
 - treat_as_invalid: recompute the finding's metric with the invalid channel-weeks left out (use the exclude argument).
 - evaluate_rule: compute the quantity the rule compares, over the weeks the note's window covers.
-- compare_to_target: one check_target call per distinct target in the note (each metric separately), for the latest week.
+- compare_to_target: leave follow_ups empty (code adds one check_target per target).
 - do_not_judge_on_metric: none. The caveat itself is the output; do not invent a workaround.
 - context_only: none.
 "N weeks" in a note means N reporting records (rows of the data), not calendar weeks; week_start dates are irregular.
@@ -70,6 +70,42 @@ def affected_records(note: NoteMeta) -> list[list]:
     chans = tools.CHANNELS if "blended" in note.channels else note.channels
     lo, hi = note.date_from or "0000", note.date_to or "9999"
     return [[c, w] for c in chans for w in tools.WEEKS if tools.week_window(w)[0] <= hi and tools.week_window(w)[1] >= lo]
+
+
+def data_end(as_of: int) -> str:
+    return tools.week_window(as_of)[1]
+
+
+def open_targets(note: NoteMeta, as_of: int) -> list:
+    """Targets due after the latest record ends: the latest week is not their final measurement."""
+    return [t for t in note.targets if t.by and t.by > data_end(as_of)]
+
+
+def _target_attachments(state: RunState, attachments: list[Attachment], emit) -> list[Attachment]:
+    """Every target in a target note gets its own check_target follow-up, built in code so none can be forgotten."""
+    for n in state.notes:
+        if not n.targets:
+            continue
+        by_id = {f.id: f for f in state.findings}
+        mine = [a for a in attachments if a.note_id == n.note_id and by_id[a.finding_id].channel in {t.channel for t in n.targets}]
+        attachments[:] = [a for a in attachments if a.note_id != n.note_id or a in mine]  # a target only bears on findings of its own channel
+        if not mine:  # the LLM confirmed no pair: attach to a blended finding so the targets are still checked
+            f = next((f for f in state.findings if f.channel == "blended"), state.findings[0])
+            mine = [Attachment(finding_id=f.id, note_id=n.note_id, implication="compare_to_target",
+                               relevance="The note sets numeric targets that must be checked against the latest week.")]
+            attachments += mine
+        late = open_targets(n, state.as_of_week)
+        for a in mine:
+            a.implication = "compare_to_target"
+            a.follow_ups = [FollowUp(tool="check_target", why=f"target {t.metric} {t.op} {t.threshold} from {n.note_id}",
+                                     args={"metric": t.metric, "week": state.as_of_week, "op": t.op, "threshold": t.threshold, "channel": t.channel})
+                            for t in n.targets]
+            a.follow_ups = [fu for fu in a.follow_ups if "error" not in tools.check_target(**fu.args)]
+            if late:
+                a.relevance += (f" The latest record ends {data_end(state.as_of_week)}, but target(s) are due {sorted({t.by for t in late})}:"
+                                " the target period is incomplete and the latest week is not the final measurement.")
+        emit("target_followups", note_id=n.note_id, targets=[t.model_dump() for t in n.targets], incomplete=[t.model_dump() for t in late])
+    return attachments
 
 
 def candidates(state: RunState) -> list[tuple[str, str]]:
@@ -129,6 +165,8 @@ def run(state: RunState) -> list[Attachment]:
             else:
                 kept.append(fu)
         a.follow_ups = kept
-        emit("attachment", **a.model_dump())
         attachments.append(a)
+    attachments = _target_attachments(state, attachments, emit)
+    for a in attachments:
+        emit("attachment", **a.model_dump())
     return attachments
