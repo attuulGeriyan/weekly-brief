@@ -29,3 +29,6 @@
 - Target notes get a `targets` list (metric, op, threshold, channel, due date) extracted at index time; context builds one `check_target` follow-up per target in code, attaches targets only to findings of the target's channel, and flags targets due after the data ends as "incomplete"; the reviewer requires every target to be reported and, when incomplete, flagged.
 - Pass 1 must include a blended finding for the latest week (validator error names the exact call to make).
 - llm.run_tool_loop forces the submit tool only for the one retry after an empty Gemini reply and on the last steps, not for the rest of the run.
+- The trace is self-contained: `tool_result` events hold the complete result, every writer draft is logged in full (`draft`), handoffs carry a structured payload, every row has the run id, and each LLM call records the requested and the API-resolved model id. `render_trace.py` writes trace.md + trace.json and cross-checks that brief.md, state.json and the trace are one run (run id, brief sha256, draft/review counts, model ids).
+- brief.md ends with an HTML comment naming its run id so the brief identifies its own run; state.json's `brief` is byte-identical to brief.md.
+- The invalid-draft demonstration has its own run id (`demo-of-<genuine run id>`), banner on every row, and its own trace.jsonl/json/md under demo_invalid_draft/.

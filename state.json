@@ -1,7 +1,8 @@
 {
- "run_id": "20261001-144850",
+ "run_id": "20261001-145625",
  "as_of_week": 12,
  "model": "gemini-2.5-flash",
+ "model_resolved": "gemini-2.5-flash",
  "notes": [
   {
    "note_id": "note_01_tracking",
@@ -12,7 +13,7 @@
    "date_from": "2026-08-07",
    "date_to": "2026-08-13",
    "kind": "data_quality",
-   "rule": "ignore conversions reported between 2026-08-07 and 2026-08-13 for google_search",
+   "rule": "ignore conversions reported between 2026-08-07 and 2026-08-13",
    "targets": []
   },
   {
@@ -37,7 +38,7 @@
    "date_from": "2026-09-01",
    "date_to": "2026-09-07",
    "kind": "campaign_change",
-   "rule": "ignore direct CPA",
+   "rule": "Do not judge on direct CPA.",
    "targets": []
   },
   {
@@ -85,7 +86,9 @@
    "evidence": {
     "tool": "compare_periods",
     "args": {
-     "metric": "spend_usd",
+     "weeks": [
+      12
+     ],
      "baseline_weeks": [
       1,
       2,
@@ -99,10 +102,8 @@
       10,
       11
      ],
-     "channel": "blended",
-     "weeks": [
-      12
-     ]
+     "metric": "spend_usd",
+     "channel": "blended"
     },
     "result": {
      "value": 23030.0,
@@ -147,9 +148,7 @@
    "evidence": {
     "tool": "compare_periods",
     "args": {
-     "weeks": [
-      12
-     ],
+     "metric": "conversions",
      "baseline_weeks": [
       1,
       2,
@@ -164,7 +163,9 @@
       11
      ],
      "channel": "blended",
-     "metric": "conversions"
+     "weeks": [
+      12
+     ]
     },
     "result": {
      "value": 288.0,
@@ -210,10 +211,6 @@
     "tool": "compare_periods",
     "args": {
      "metric": "revenue_usd",
-     "channel": "blended",
-     "weeks": [
-      12
-     ],
      "baseline_weeks": [
       1,
       2,
@@ -226,7 +223,11 @@
       9,
       10,
       11
-     ]
+     ],
+     "weeks": [
+      12
+     ],
+     "channel": "blended"
     },
     "result": {
      "value": 17856.0,
@@ -271,7 +272,11 @@
    "evidence": {
     "tool": "compare_periods",
     "args": {
+     "weeks": [
+      12
+     ],
      "channel": "blended",
+     "metric": "cpa",
      "baseline_weeks": [
       1,
       2,
@@ -284,10 +289,6 @@
       9,
       10,
       11
-     ],
-     "metric": "cpa",
-     "weeks": [
-      12
      ]
     },
     "result": {
@@ -1925,15 +1926,15 @@
    "value": 79.97,
    "baseline": null,
    "change_pct": null,
-   "statement": "The blended CPA in week 12 was 79.97, which did not meet the target threshold of < 65.0.",
+   "statement": "In week 12, blended CPA was 79.97, which did not meet the threshold of < 65.0.",
    "evidence": {
     "tool": "check_target",
     "args": {
-     "channel": "blended",
      "threshold": 65,
-     "op": "<",
+     "metric": "cpa",
+     "channel": "blended",
      "week": 12,
-     "metric": "cpa"
+     "op": "<"
     },
     "result": {
      "value": 79.97,
@@ -1957,14 +1958,14 @@
    "value": 17856.0,
    "baseline": null,
    "change_pct": null,
-   "statement": "The blended revenue_usd in week 12 was 17856.0, which did not meet the target threshold of > 25000.0.",
+   "statement": "In week 12, blended revenue_usd was 17856.0, which did not meet the threshold of > 25000.0.",
    "evidence": {
     "tool": "check_target",
     "args": {
-     "metric": "revenue_usd",
-     "op": ">",
-     "channel": "blended",
      "week": 12,
+     "channel": "blended",
+     "op": ">",
+     "metric": "revenue_usd",
      "threshold": 25000
     },
     "result": {
@@ -1994,13 +1995,12 @@
    "value": 1.92,
    "baseline": null,
    "change_pct": null,
-   "statement": "The ratio of TikTok CPA to Meta CPA over weeks 7-12 was 1.92.",
+   "statement": "Over weeks 7-12, the ratio of tiktok CPA to meta CPA was 1.92.",
    "evidence": {
     "tool": "compare_channels",
     "args": {
-     "channel_b": "meta",
-     "channel_a": "tiktok",
      "metric": "cpa",
+     "channel_a": "tiktok",
      "weeks": [
       7,
       8,
@@ -2008,7 +2008,8 @@
       10,
       11,
       12
-     ]
+     ],
+     "channel_b": "meta"
     },
     "result": {
      "a": 156.12,
@@ -2026,7 +2027,7 @@
   {
    "finding_id": "F3",
    "note_id": "note_04_targets",
-   "relevance": "The note sets a target for blended revenue by the end of September, which directly relates to the finding about blended revenue in week 12 (end of September). The latest record ends 2026-09-28, but target(s) are due ['2026-09-30']: the target period is incomplete and the latest week is not the final measurement.",
+   "relevance": "The note sets a target for blended weekly revenue by the end of September, which directly relates to the finding's blended revenue_usd in week 12. The latest record ends 2026-09-28, but target(s) are due ['2026-09-30']: the target period is incomplete and the latest week is not the final measurement.",
    "implication": "compare_to_target",
    "follow_ups": [
     {
@@ -2056,7 +2057,7 @@
   {
    "finding_id": "F4",
    "note_id": "note_04_targets",
-   "relevance": "The note sets a target for blended CPA by the end of September, which directly relates to the finding about blended CPA in week 12 (end of September). The latest record ends 2026-09-28, but target(s) are due ['2026-09-30']: the target period is incomplete and the latest week is not the final measurement.",
+   "relevance": "The note sets a target for blended CPA, which directly relates to the finding's blended CPA in week 12. The latest record ends 2026-09-28, but target(s) are due ['2026-09-30']: the target period is incomplete and the latest week is not the final measurement.",
    "implication": "compare_to_target",
    "follow_ups": [
     {
@@ -2086,22 +2087,22 @@
   {
    "finding_id": "F5",
    "note_id": "note_01_tracking",
-   "relevance": "The note states that Google Ads conversion data for google_search between Aug 7-13 (week 6) is invalid, directly impacting the CPA finding for google_search in week 6. The note's dates (2026-08-07 to 2026-08-13) overlap the weekly records for weeks 5, 6 (google_search); the weekly data cannot isolate the affected days, so every one of those records is uncertain.",
+   "relevance": "The note indicates that conversions for google_search in week 6 are invalid, directly impacting the CPA metric in the finding. The note's dates (2026-08-07 to 2026-08-13) overlap the weekly records for weeks 5, 6 (google_search); the weekly data cannot isolate the affected days, so every one of those records is uncertain.",
    "implication": "treat_as_invalid",
    "follow_ups": []
   },
   {
    "finding_id": "F6",
    "note_id": "note_02_tiktok",
-   "relevance": "The note describes a TikTok budget increase starting the week of Aug 15 (week 7) for a 6-week test period, which directly aligns with the finding about a level shift in TikTok spend_usd over weeks 7-12. The note also provides a rule to evaluate this experiment.",
+   "relevance": "The note describes a TikTok budget increase starting in week 7 for a 6-week test period, which directly explains the level shift in TikTok spend_usd over weeks 7-12. It also provides a rule for evaluation.",
    "implication": "evaluate_rule",
    "follow_ups": [
     {
      "tool": "compare_channels",
      "args": {
-      "channel_a": "tiktok",
-      "channel_b": "meta",
       "metric": "cpa",
+      "channel_b": "meta",
+      "channel_a": "tiktok",
       "weeks": [
        7,
        8,
@@ -2111,22 +2112,22 @@
        12
       ]
      },
-     "why": "Evaluate the experiment rule by comparing TikTok CPA to Meta CPA over the 6-week test period (weeks 7-12)."
+     "why": "To evaluate the rule 'cut if cpa(tiktok)/cpa(meta) > 1.5' over the test period (weeks 7-12)."
     }
    ]
   },
   {
    "finding_id": "F7",
    "note_id": "note_03_brand",
-   "relevance": "The note explains that a brand awareness campaign launched on Meta the week of Sep 1 (week 9), which directly accounts for the observed level shift in Meta spend_usd over weeks 9-12.",
-   "implication": "context_only",
+   "relevance": "The note explains that a brand awareness campaign went live on Meta in week 9, which would cause spend to jump, directly explaining the level shift in Meta spend_usd over weeks 9-12.",
+   "implication": "do_not_judge_on_metric",
    "follow_ups": []
   }
  ],
  "drafts": [
-  "## Headline\nBlended spend increased in the latest week, but conversions and revenue declined, leading to a higher blended CPA that missed targets. Several channel-specific changes and data caveats require attention.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030 [F1], 10.8% higher [F1] than the $20,785.27 [F1] weekly average over weeks 1-11. However, blended conversions in week 12 were 288 [F2], 1.7% lower [F2] than the 293 [F2] weekly average, and blended revenue in week 12 was $17,856 [F3], 1.7% lower [F3] than the $18,166 [F3] weekly average. Blended CPA in week 12 was $79.97 [F4], 12.7% higher [F4] than the $70.94 [F4] baseline.\n\n## What the numbers mean\nGoogle Search CPA in week 6 was $202.90 [F5], 222.1% higher [F5] than the $62.99 [F5] baseline, but this data is invalid [N1] due to a conversion tag break between Aug 7-13 [N1]. The weekly data cannot isolate the affected days. Email CPA in week 8 was $23.25 [F8], 35.7% higher [F8] than the $17.14 [F8] baseline.\n\nTikTok spend averaged $4,787.83 per week [F6] over weeks 7-12, 66.7% higher [F6] than the $2,872.33 [F6] weekly average baseline, as part of an experiment to scale budget [N2]. The ratio of TikTok CPA to Meta CPA over weeks 7-12 was 1.92x [F11]. The agreed evaluation rule [N2] is to cut TikTok if its CPA is more than 1.5x [N2] Meta's CPA over the test period.\n\nMeta spend averaged $8,935.50 per week [F7] over weeks 9-12, 26.9% higher [F7] than the $7,040.38 [F7] weekly average baseline, due to a brand awareness campaign launch [N3] the week of Sep 1 [N3]. This campaign is upper-funnel and should not be judged on direct CPA [N3].\n\nBlended CPA in week 12 was $79.97 [F9], which did not meet the Q3 target of under $65 [N4]. Blended revenue in week 12 was $17,856 [F10], which did not meet the Q3 target of above $25k [N4]. The Q3 target period is incomplete [N4], as data ends Sep 28 but targets are due Sep 30 [N4].\n\n## Decisions needed\nEvaluate the TikTok experiment based on the CPA ratio against Meta.\n\n## Recommended actions\n- Review TikTok performance against the 1.5x [N2] Meta CPA threshold for the test period.\n- Investigate the Email CPA outlier in week 8 [F8] for potential causes or lasting impact.\n- Monitor blended CPA and revenue closely for the remainder of Q3 to assess target attainment.\n\n## Data caveats\nGoogle Ads conversion data for Google Search between Aug 7-13 [N1] (week 6) is invalid [N1], affecting CPA for that period. The Q3 target period for blended CPA and revenue is incomplete [N4], with data ending Sep 28 [N4] and targets due Sep 30 [N4].",
-  "## Headline\nBlended spend increased in the latest week, but conversions and revenue declined, leading to a higher blended CPA that missed targets. Several channel-specific changes and data caveats require attention.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030 [F1], 10.8% higher [F1] than the $20,785.27 [F1] weekly average over weeks 1-11. However, blended conversions (288 [F2]) and revenue ($17,856 [F3]) were both 1.7% lower [F2, F3] than their weekly averages, resulting in a blended CPA of $79.97 [F4], 12.7% higher [F4] than the $70.94 [F4] baseline.\n\n## What the numbers mean\nGoogle Search CPA in week 6 was $202.90 [F5], 222.1% higher [F5] than the $62.99 [F5] baseline, but is invalid [N1] due to a conversion tag break (Aug 7-13 [N1]). Weekly data cannot isolate affected days, making weeks 5 and 6 records uncertain [N1]. Email CPA in week 8 was $23.25 [F8], 35.7% higher [F8] than baseline $17.14 [F8].\n\nTikTok spend averaged $4,787.83 per week [F6] over weeks 7-12, 66.7% higher [F6] than $2,872.33 [F6], for a budget test [N2]. Its CPA to Meta CPA ratio over weeks 7-12 was 1.92x [F11], exceeding the 1.5x [N2] threshold [N2]. Meta spend averaged $8,935.50 per week [F7] over weeks 9-12, 26.9% higher [F7] than $7,040.38 [F7], following a brand awareness campaign launch [N3] in week 9 [N3]. Do not judge this upper-funnel campaign on direct CPA [N3]. Blended CPA in week 12 ($79.97 [F9]) and revenue ($17,856 [F10]) missed Q3 targets of under $65 [N4] and above $25k [N4] respectively. The Q3 target period is incomplete [N4], with data ending Sep 28 but targets due Sep 30 [N4].\n\n## Decisions needed\nEvaluate the TikTok experiment based on the CPA ratio against Meta.\n\n## Recommended actions\n- Review TikTok performance against the 1.5x [N2] Meta CPA threshold.\n- Investigate the Email CPA outlier in week 8 [F8] for potential causes or lasting impact.\n- Monitor blended CPA and revenue for Q3 target attainment.\n\n## Data caveats\nGoogle Ads conversion data for Google Search (weeks 5-6) is invalid [N1] due to a tag break (Aug 7-13 [N1]), affecting CPA. Q3 blended CPA and revenue targets are incomplete [N4], with data ending Sep 28 [N4] but targets due Sep 30 [N4].",
-  "## Headline\nBlended spend increased in the latest week, but conversions and revenue declined, leading to a higher blended CPA that missed targets. Several channel-specific changes and data caveats require attention.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030 [F1], 10.8% higher [F1] than the $20,785.27 [F1] weekly average over weeks 1-11. However, blended conversions (288 [F2]) and revenue ($17,856 [F3]) were both 1.7% lower [F2, F3] than their weekly averages, resulting in a blended CPA of $79.97 [F4], 12.7% higher [F4] than the $70.94 [F4] baseline.\n\n## What the numbers mean\nGoogle Search CPA in week 6 was $202.90 [F5], 222.1% higher [F5] than the $62.99 [F5] baseline, but is invalid [N1] due to a conversion tag break (Aug 7-13 [N1]). Weekly data cannot isolate affected days, making weeks 5 and 6 records uncertain [N1]. Email CPA in week 8 was $23.25 [F8], 35.7% higher [F8] than baseline $17.14 [F8].\n\nTikTok spend averaged $4,787.83 per week [F6] over weeks 7-12, 66.7% higher [F6] than $2,872.33 [F6], for a budget test [N2]. The TikTok CPA to Meta CPA ratio over weeks 7-12 was 1.92x [F11]. This ratio of 1.92x [F11] is higher than the 1.5x [N2] threshold, indicating the TikTok experiment should be cut [N2]. Meta spend averaged $8,935.50 per week [F7] over weeks 9-12, 26.9% higher [F7] than $7,040.38 [F7], following a brand awareness campaign launch [N3] in week 9 [N3]. Do not judge this upper-funnel campaign on direct CPA [N3]. Blended CPA in week 12 ($79.97 [F9]) and revenue ($17,856 [F10]) missed Q3 targets of under $65 [N4] and above $25k [N4] respectively. The Q3 target period is incomplete [N4], with data ending Sep 28 but targets due Sep 30 [N4].\n\n## Decisions needed\nDecide whether to cut the TikTok experiment given its CPA ratio to Meta.\n\n## Recommended actions\n- Cut the TikTok experiment as its CPA to Meta CPA ratio of 1.92x [F11] exceeds the 1.5x [N2] threshold.\n- Investigate the Email CPA outlier in week 8 [F8] for potential causes or lasting impact.\n- Monitor blended CPA and revenue for Q3 target attainment.\n\n## Data caveats\nGoogle Ads conversion data for Google Search (weeks 5-6) is invalid [N1] due to a tag break (Aug 7-13 [N1]), affecting CPA. Q3 blended CPA and revenue targets are incomplete [N4], with data ending Sep 28 [N4] but targets due Sep 30 [N4]."
+  "# Marketing Brief: Week 12 Performance Review\n\nBlended spend increased in the latest week, but conversions and revenue declined, leading to a higher blended CPA that missed targets. The TikTok budget increase experiment exceeded its CPA threshold and requires a decision.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030 [F1], 10.8% higher [F1] than the $20,785.27 [F1] weekly average over weeks 1-11, while blended conversions were 288 [F2], 1.7% lower [F2] than the 293 [F2] weekly average, and blended revenue was $17,856 [F3], 1.7% lower [F3] than the $18,166 [F3] weekly average.\n\n## What the numbers mean\nBlended CPA in week 12 was $79.97 [F4], 12.7% higher [F4] than the $70.94 [F4] baseline, not meeting the Q3 target of under $65 [N4]. Blended revenue in week 12 was $17,856 [F10], which did not meet the Q3 target of above $25k [N4]. The Q3 target period is incomplete, with data ending Sep 28 for a Sep 30 deadline [N4]. TikTok spend averaged $4,787.83 per week [F6] over weeks 7-12, 66.7% higher [F6] than the $2,872.33 [F6] baseline, following the budget increase [N2]. The ratio of TikTok CPA to Meta CPA over weeks 7-12 was 1.92x [F11], exceeding the 1.5x [N2] threshold for cutting the experiment [N2]. Meta spend averaged $8,935.50 per week [F7] over weeks 9-12, 26.9% higher [F7] than the $7,040.38 [F7] baseline, due to the brand awareness campaign launch [N3]. This campaign should not be judged on direct CPA [N3]. Google Search CPA in week 6 was $202.90 [F5], 222.1% higher [F5] than the $62.99 [F5] baseline; however, Google Ads conversion tracking was broken from Aug 7 to Aug 13 [N1], making conversions for week 6 invalid and the CPA uncertain [N1]. Email CPA in week 8 was $23.25 [F8], 35.7% higher [F8] than the $17.14 [F8] baseline.\n\n## Decisions needed\nDecide whether to cut the TikTok budget increase experiment, as its CPA ratio exceeded the agreed threshold.\n\n## Recommended actions\n- Cut the TikTok budget increase experiment due to its CPA ratio exceeding the 1.5x [N2] threshold against Meta CPA.\n- Review overall blended CPA and revenue strategy to address missed Q3 targets.\n- Investigate the cause of the Email CPA increase in week 8.\n\n## Data caveats\nGoogle Ads conversion tracking was broken from Aug 7 to Aug 13 [N1], affecting Google Search CPA in week 6 [N1]. The Meta brand awareness campaign launched in week 9 should not be judged on direct CPA [N3]. Q3 targets for blended CPA and revenue are based on an incomplete period, with data ending Sep 28 for a Sep 30 deadline [N4].",
+  "# Marketing Brief: Week 12 Performance Review\n\nBlended spend increased in the latest week, but conversions and revenue declined, leading to a higher blended CPA that missed targets. The TikTok budget increase experiment exceeded its CPA threshold and requires a decision.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030 [F1], 10.8% higher [F1] than the $20,785.27 [F1] weekly average over weeks 1-11. Blended conversions (288 [F2]) and revenue ($17,856 [F3]) were both 1.7% lower [F2, F3] than their respective weekly averages.\n\n## What the numbers mean\nBlended CPA in week 12 was $79.97 [F9], missing the Q3 target of under $65 [N4]. Blended revenue of $17,856 [F10] also missed its Q3 target of above $25k [N4]. The Q3 target period is incomplete, ending Sep 28 for a Sep 30 deadline [N4]. TikTok spend averaged $4,787.83 per week [F6] over weeks 7-12, 66.7% higher [F6] than the $2,872.33 [F6] baseline, following a budget increase [N2]. Its CPA ratio to Meta CPA was 1.92x [F11], exceeding the 1.5x [N2] threshold. Meta spend averaged $8,935.50 per week [F7] over weeks 9-12, 26.9% higher [F7] than the $7,040.38 [F7] baseline, due to a brand awareness campaign [N3]. Do not judge this campaign on direct CPA [N3]. Google Search CPA in week 6 was $202.90 [F5], 222.1% higher [F5] than the $62.99 [F5] baseline. Google Ads conversion tracking was broken Aug 7-13 [N1], making conversions for weeks 5-6 invalid and CPA uncertain [N1]. Email CPA in week 8 was $23.25 [F8], 35.7% higher [F8] than the $17.14 [F8] baseline.\n\n## Decisions needed\nDecide whether to cut the TikTok budget increase experiment, as its CPA ratio exceeded the agreed threshold.\n\n## Recommended actions\n- Cut the TikTok budget increase experiment; its CPA ratio exceeded the 1.5x [N2] threshold against Meta CPA.\n- Review blended CPA and revenue strategy to address missed Q3 targets.\n- Investigate the cause of the Email CPA increase in week 8.\n\n## Data caveats\nGoogle Ads conversion tracking was broken from Aug 7-13 [N1], affecting Google Search CPA in weeks 5-6 [N1]. Meta's brand awareness campaign in week 9 should not be judged on direct CPA [N3]. Blended Q3 CPA and revenue targets are based on an incomplete period, ending Sep 28 for a Sep 30 deadline [N4].",
+  "# Marketing Brief: Week 12 Performance Review\n\nBlended spend increased in the latest week, but conversions and revenue declined, leading to a higher blended CPA that missed targets. The TikTok budget increase experiment exceeded its CPA threshold and requires a decision.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030 [F1], 10.8% higher [F1] than the $20,785.27 [F1] weekly average over weeks 1-11. Blended conversions (288 [F2]) and revenue ($17,856 [F3]) were both 1.7% lower [F2, F3] than their respective weekly averages.\n\n## What the numbers mean\nBlended CPA in week 12 was $79.97 [F9], missing the Q3 target of under $65 [N4]. Blended revenue of $17,856 [F10] also missed its Q3 target of above $25k [N4]. The Q3 target period is incomplete, ending Sep 28 for a Sep 30 deadline [N4]. TikTok spend averaged $4,787.83 per week [F6] over weeks 7-12, 66.7% higher [F6] than the $2,872.33 [F6] baseline, following a budget increase [N2]. The TikTok CPA ratio to Meta CPA was 1.92x [F11] over weeks 7-12, exceeding the 1.5x [N2] threshold. Meta spend averaged $8,935.50 per week [F7] over weeks 9-12, 26.9% higher [F7] than the $7,040.38 [F7] baseline, due to a brand awareness campaign [N3]. Do not judge this campaign on direct CPA [N3]. Google Search CPA in week 6 was $202.90 [F5], 222.1% higher [F5] than the $62.99 [F5] baseline. Google Ads conversion tracking was broken Aug 7-13 [N1], making conversions for weeks 5-6 invalid and CPA uncertain [N1]. Email CPA in week 8 was $23.25 [F8], 35.7% higher [F8] than the $17.14 [F8] baseline.\n\n## Decisions needed\nDecide whether to cut the TikTok budget increase experiment, as its CPA ratio exceeded the agreed threshold.\n\n## Recommended actions\n- Cut the TikTok budget increase experiment; TikTok's CPA ratio exceeded the 1.5x [N2] threshold against Meta CPA.\n- Review blended CPA and revenue strategy to address missed Q3 targets.\n- Investigate the cause of the Email CPA increase in week 8.\n\n## Data caveats\nGoogle Ads conversion tracking was broken from Aug 7-13 [N1], affecting Google Search CPA in weeks 5-6 [N1]. Meta's brand awareness campaign in week 9 should not be judged on direct CPA [N3]. Blended Q3 CPA and revenue targets are based on an incomplete period, ending Sep 28 for a Sep 30 deadline [N4]."
  ],
  "reviews": [
   {
@@ -2139,10 +2140,16 @@
      "got": null
     },
     {
-     "kind": "length",
-     "detail": "421 words in the rendered brief; must be 200-400 (cut about 41 words)",
+     "kind": "missing_note_caveat",
+     "detail": "the draft never reports note_04_targets target cpa < 65; cite its finding ['F9']",
      "expected": null,
-     "got": "421"
+     "got": null
+    },
+    {
+     "kind": "length",
+     "detail": "407 words in the rendered brief; must be 200-400 (cut about 27 words)",
+     "expected": null,
+     "got": "407"
     }
    ]
   },
@@ -2154,12 +2161,6 @@
      "detail": "1.92x ['F11']: [channel] the number is introduced as ['meta'] but the finding is about 'tiktok'",
      "expected": null,
      "got": "1.92x"
-    },
-    {
-     "kind": "rule_outcome_mismatch",
-     "detail": "rule 'cut if cpa(tiktok)/cpa(meta) > 1.5 over the test period' fires (value 1.92) but no 'cut' decision is stated near F11/N2",
-     "expected": null,
-     "got": null
     }
    ]
   },
@@ -2169,5 +2170,5 @@
   }
  ],
  "attempts": 3,
- "brief": "## Headline\nBlended spend increased in the latest week, but conversions and revenue declined, leading to a higher blended CPA that missed targets. Several channel-specific changes and data caveats require attention.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030, 10.8% higher than the $20,785.27 weekly average over weeks 1-11. However, blended conversions (288) and revenue ($17,856) were both 1.7% lower than their weekly averages, resulting in a blended CPA of $79.97, 12.7% higher than the $70.94 baseline.\n\n## What the numbers mean\nGoogle Search CPA in week 6 was $202.90, 222.1% higher than the $62.99 baseline, but is invalid (note_01_tracking) due to a conversion tag break (Aug 7-13 (note_01_tracking)). Weekly data cannot isolate affected days, making weeks 5 and 6 records uncertain (note_01_tracking). Email CPA in week 8 was $23.25, 35.7% higher than baseline $17.14.\n\nTikTok spend averaged $4,787.83 per week over weeks 7-12, 66.7% higher than $2,872.33, for a budget test (note_02_tiktok). The TikTok CPA to Meta CPA ratio over weeks 7-12 was 1.92x. This ratio of 1.92x is higher than the 1.5x (note_02_tiktok) threshold, indicating the TikTok experiment should be cut (note_02_tiktok). Meta spend averaged $8,935.50 per week over weeks 9-12, 26.9% higher than $7,040.38, following a brand awareness campaign launch (note_03_brand) in week 9 (note_03_brand). Do not judge this upper-funnel campaign on direct CPA (note_03_brand). Blended CPA in week 12 ($79.97) and revenue ($17,856) missed Q3 targets of under $65 (note_04_targets) and above $25k (note_04_targets) respectively. The Q3 target period is incomplete (note_04_targets), with data ending Sep 28 but targets due Sep 30 (note_04_targets).\n\n## Decisions needed\nDecide whether to cut the TikTok experiment given its CPA ratio to Meta.\n\n## Recommended actions\n- Cut the TikTok experiment as its CPA to Meta CPA ratio of 1.92x exceeds the 1.5x (note_02_tiktok) threshold.\n- Investigate the Email CPA outlier in week 8 for potential causes or lasting impact.\n- Monitor blended CPA and revenue for Q3 target attainment.\n\n## Data caveats\nGoogle Ads conversion data for Google Search (weeks 5-6) is invalid (note_01_tracking) due to a tag break (Aug 7-13 (note_01_tracking)), affecting CPA. Q3 blended CPA and revenue targets are incomplete (note_04_targets), with data ending Sep 28 (note_04_targets) but targets due Sep 30 (note_04_targets).\n\n---\nSources: note_01_tracking, note_02_tiktok, note_03_brand, note_04_targets"
+ "brief": "# Marketing Brief: Week 12 Performance Review\n\nBlended spend increased in the latest week, but conversions and revenue declined, leading to a higher blended CPA that missed targets. The TikTok budget increase experiment exceeded its CPA threshold and requires a decision.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030, 10.8% higher than the $20,785.27 weekly average over weeks 1-11. Blended conversions (288) and revenue ($17,856) were both 1.7% lower than their respective weekly averages.\n\n## What the numbers mean\nBlended CPA in week 12 was $79.97, missing the Q3 target of under $65 (note_04_targets). Blended revenue of $17,856 also missed its Q3 target of above $25k (note_04_targets). The Q3 target period is incomplete, ending Sep 28 for a Sep 30 deadline (note_04_targets). TikTok spend averaged $4,787.83 per week over weeks 7-12, 66.7% higher than the $2,872.33 baseline, following a budget increase (note_02_tiktok). The TikTok CPA ratio to Meta CPA was 1.92x over weeks 7-12, exceeding the 1.5x (note_02_tiktok) threshold. Meta spend averaged $8,935.50 per week over weeks 9-12, 26.9% higher than the $7,040.38 baseline, due to a brand awareness campaign (note_03_brand). Do not judge this campaign on direct CPA (note_03_brand). Google Search CPA in week 6 was $202.90, 222.1% higher than the $62.99 baseline. Google Ads conversion tracking was broken Aug 7-13 (note_01_tracking), making conversions for weeks 5-6 invalid and CPA uncertain (note_01_tracking). Email CPA in week 8 was $23.25, 35.7% higher than the $17.14 baseline.\n\n## Decisions needed\nDecide whether to cut the TikTok budget increase experiment, as its CPA ratio exceeded the agreed threshold.\n\n## Recommended actions\n- Cut the TikTok budget increase experiment; TikTok's CPA ratio exceeded the 1.5x (note_02_tiktok) threshold against Meta CPA.\n- Review blended CPA and revenue strategy to address missed Q3 targets.\n- Investigate the cause of the Email CPA increase in week 8.\n\n## Data caveats\nGoogle Ads conversion tracking was broken from Aug 7-13 (note_01_tracking), affecting Google Search CPA in weeks 5-6 (note_01_tracking). Meta's brand awareness campaign in week 9 should not be judged on direct CPA (note_03_brand). Blended Q3 CPA and revenue targets are based on an incomplete period, ending Sep 28 for a Sep 30 deadline (note_04_targets).\n\n---\nSources: note_04_targets, note_02_tiktok, note_03_brand, note_01_tracking\n\n<!-- run_id: 20261001-145625 -->\n"
 }

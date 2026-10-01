@@ -17,6 +17,7 @@ def _load_env(path=".env"):
 
 _load_env()
 MODEL = os.environ.get("MODEL")  # no default; main.py may override with --model
+RESOLVED = None  # the model id the API reports it actually served (set after the first call)
 _client = OpenAI(api_key=os.environ.get("GEMINI_API_KEY", "missing"), base_url=BASE_URL, max_retries=5)
 
 
@@ -53,8 +54,10 @@ def _chat(messages, specs, tool_choice, emit):
     resp = _client.chat.completions.create(
         model=MODEL.removeprefix("models/"), temperature=0, messages=messages, tools=specs, tool_choice=tool_choice)
     choice = resp.choices[0]
-    emit("llm_call", model=MODEL, tokens_in=resp.usage.prompt_tokens, tokens_out=resp.usage.completion_tokens,
-         stop_reason=choice.finish_reason)
+    global RESOLVED
+    RESOLVED = resp.model or RESOLVED
+    emit("llm_call", model_requested=MODEL, model_resolved=resp.model, tokens_in=resp.usage.prompt_tokens,
+         tokens_out=resp.usage.completion_tokens, stop_reason=choice.finish_reason)
     return choice.message
 
 
@@ -90,8 +93,8 @@ def run_tool_loop(system: str, user: str, tools: list[dict], max_steps: int = 8,
                 result = by_name[name]["fn"](**args)
             except Exception as e:  # bad tool name or args: tell the model, don't crash
                 result = {"error": f"{type(e).__name__}: {e}"}
+            emit("tool_result", tool=name, result=result)  # complete result: the trace must be readable without re-running anything
             text = json.dumps(result, default=str)
-            emit("tool_result", tool=name, result=text[:500] + ("...[truncated]" if len(text) > 500 else ""), chars=len(text))
             messages.append({"role": "tool", "tool_call_id": call.id, "content": json.dumps(result, default=str)})
             if name == final and "error" not in result:
                 return {"final": result, "steps": step}

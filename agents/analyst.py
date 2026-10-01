@@ -145,6 +145,7 @@ def run(state: RunState, pass_no: int = 1) -> list[Finding]:
         # readable proof in the trace (tool_result events are truncated): the finding next to the call that supports it
         emit("finding_recorded", id=f.id, kind=f.kind, channel=f.channel, weeks=f.weeks, metric=f.metric, value=f.value,
              baseline=f.baseline, change_pct=f.change_pct, statement=f.statement, derived_from=f.derived_from,
-             evidence={"tool": call["tool"], "args": call["args"]})
+             aggregation=f.aggregation, baseline_aggregation=f.baseline_aggregation,
+             evidence={"tool": call["tool"], "args": call["args"], "call_id": calls.index(call)}, supported_by=fact)
         findings.append(f)
     return findings

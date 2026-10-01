@@ -1,13 +1,14 @@
 """INVALID-DRAFT DEMONSTRATION (`python main.py --inject-error`). Separate from the genuine run.
 Takes the genuine approved draft saved in state.json, corrupts it one dimension at a time, shows the reviewer reject each,
 then shows one corrupted draft going through the real reject -> retry (writer) -> approve loop.
-Writes only to demo_invalid_draft/; nothing here touches trace.jsonl or brief.md."""
+Writes only to demo_invalid_draft/ (trace.jsonl, trace.json, trace.md, summary.md, brief_after_retry.md); nothing here touches the genuine files."""
 import os
 import re
 
 import agents.reviewer as reviewer
 import agents.writer as writer
 import citations as cz
+import render_trace
 import tools
 import trace
 from loop import write_and_review
@@ -92,7 +93,7 @@ def run():
         raise SystemExit("the saved genuine run was not approved, so there is no valid draft to corrupt: rerun python main.py")
     good = genuine.drafts[-1]
     os.makedirs(DIR, exist_ok=True)
-    trace.start(f"{DIR}/trace.jsonl", demo=BANNER)
+    trace.start(f"{DIR}/trace.jsonl", demo=BANNER, run_id=f"demo-of-{genuine.run_id}")
     trace.log("demo", "demo_banner", detail=BANNER, source="draft taken from state.json (genuine run " + genuine.run_id + ")")
     lines = [f"# {BANNER}", "", f"Source: approved draft of genuine run `{genuine.run_id}`. Each row corrupts ONE thing in that draft.", "",
              "| corruption | change | verdict | caught as |", "|---|---|---|---|"]
@@ -107,6 +108,7 @@ def run():
             continue
         review = reviewer.run(genuine, bad)
         trace.log("demo", "fault_injected", fault=name, change=_diff(good, bad))
+        trace.log("demo", "invalid_draft", fault=name, text=bad)  # the full corrupted draft that is about to be reviewed
         trace.log("reviewer", "review_verdict", fault=name, verdict=review.verdict, issues=[i.detail for i in review.issues])
         caught = [i.detail[:90] for i in review.issues if tag in i.detail] or [f"NOT caught as {tag}: " + "; ".join(i.kind for i in review.issues)]
         lines.append(f"| {name} | {_diff(good, bad)} | {review.verdict} | {caught[0]} |")
@@ -123,3 +125,4 @@ def run():
         open(f"{DIR}/brief_after_retry.md", "w").write(f"> {BANNER}\n\n" + writer.render(state.drafts[-1], state) + "\n")
     open(f"{DIR}/summary.md", "w").write("\n".join(lines) + "\n")
     print("\n".join(lines))
+    print("\n".join(("OK   " if ok else "FAIL ") + m for ok, m in render_trace.write_all(DIR)))

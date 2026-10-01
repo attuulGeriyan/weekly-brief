@@ -76,7 +76,8 @@ class Review(BaseModel):
 class RunState(BaseModel):
     run_id: str
     as_of_week: int
-    model: str
+    model: str  # requested (MODEL env or --model)
+    model_resolved: str | None = None  # the id the API reports it served
     notes: list[NoteMeta] = []
     findings: list[Finding] = []  # pass 1 and pass 2
     attachments: list[Attachment] = []
