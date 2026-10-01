@@ -6,7 +6,7 @@
 | | |
 |---|---|
 | run id | `demo-of-20261001-145625` |
-| as-of week | None |
+| as-of week | n/a (demonstration) |
 | model requested / resolved | `gemini-2.5-flash` / `gemini-2.5-flash` |
 | status | approved |
 | started → finished | 2026-10-01T09:29:39+00:00 → 2026-10-01T09:30:44+00:00 |

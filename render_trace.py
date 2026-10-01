@@ -160,7 +160,7 @@ def write_all(directory: str = ".") -> list[tuple[bool, str]]:
     if demo:
         md += ["", f"> **{rows[0]['demo']}**", "> Nothing below is the genuine run's output; the genuine trace is `trace.md` in the project root."]
     tokens = (sum(r["tokens_in"] for r in llm_rows), sum(r["tokens_out"] for r in llm_rows))
-    md += ["", "| | |", "|---|---|", f"| run id | `{head['run_id']}` |", f"| as-of week | {head['as_of_week']} |",
+    md += ["", "| | |", "|---|---|", f"| run id | `{head['run_id']}` |", f"| as-of week | {head['as_of_week'] or 'n/a (demonstration)'} |",
            f"| model requested / resolved | `{head['model_requested']}` / `{head['model_resolved']}` |", f"| status | {head['status']} |",
            f"| started → finished | {head['started']} → {head['finished']} |", f"| events | {len(rows)} (full data in trace.json / trace.jsonl) |",
            f"| LLM calls | {len(llm_rows)} (tokens in {tokens[0]:,} / out {tokens[1]:,}) |", "",
