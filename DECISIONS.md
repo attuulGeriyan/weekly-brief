@@ -1,1 +1,5 @@
 - Switched to Gemini via OpenAI-compatible API because the provided key is Gemini; provider isolated in llm.py.
+- Added a 6th tool, `compare_periods` (value, baseline, change_pct, weekly averages for totals), so the LLM never computes percentages or compares a 1-week total to a multi-week total.
+- Analyst's submit_findings is validated by the harness: evidence call must exist, `value` must appear in that call's result, baseline/change_pct and every number in the statement must appear in some tool result; otherwise the error goes back to the model.
+- run_tool_loop forces the final tool on the last step and gives 2 extra steps to fix a rejected submission; empty/MALFORMED Gemini replies are retried (max 4) without using a step, with the final tool forced.
+- index_notes is built in Phase 3 (BUILD_PLAN lists its file there), so Phase 2's main.py runs analyst pass 1 only.

@@ -28,6 +28,14 @@ def _with_derived(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def _ex(exclude) -> list:
+    """Coerce exclude entries to [channel, int week] (LLMs sometimes send the week as a string)."""
+    try:
+        return [[c, int(w)] for c, w in exclude]
+    except (TypeError, ValueError):
+        return exclude
+
+
 def _bad(what, got, valid):
     return {"error": f"unknown {what}: {got}", "valid": valid}
 
@@ -62,6 +70,7 @@ def get_weekly(channels: list[str] | None = None, weeks: list[int] | None = None
 
 
 def compute_kpi(channel: str, weeks: list[int], exclude: list[list] = []) -> dict:
+    exclude = _ex(exclude)
     if err := _check([channel], weeks, exclude, allow_blended=True):
         return err
     df = DF[DF["week"].isin(weeks)]
@@ -79,7 +88,7 @@ def compute_kpi(channel: str, weeks: list[int], exclude: list[list] = []) -> dic
 
 
 def compare_channels(channel_a: str, channel_b: str, weeks: list[int], metric: str = "cpa", exclude: list[list] = []) -> dict:
-    key = KPI_ALIAS.get(metric, metric)
+    key, exclude = KPI_ALIAS.get(metric, metric), _ex(exclude)
     a, b = compute_kpi(channel_a, weeks, exclude), compute_kpi(channel_b, weeks, exclude)
     for r in (a, b):
         if "error" in r:
@@ -89,10 +98,26 @@ def compare_channels(channel_a: str, channel_b: str, weeks: list[int], metric: s
     return {"a": a[key], "b": b[key], "ratio": _div(a[key], b[key]), "metric": metric}
 
 
+def compare_periods(channel: str, weeks: list[int], baseline_weeks: list[int], metric: str = "cpa", exclude: list[list] = []) -> dict:
+    """Like-for-like change of one period vs another: weekly averages for totals, plain ratios for cpa/roas."""
+    key, exclude = KPI_ALIAS.get(metric, metric), _ex(exclude)
+    a, b = compute_kpi(channel, weeks, exclude), compute_kpi(channel, baseline_weeks, exclude)
+    for r in (a, b):
+        if "error" in r:
+            return r
+    if key not in ("spend", "conversions", "revenue", "cpa", "roas"):
+        return _bad("metric", metric, ["spend_usd", "conversions", "revenue_usd", "cpa", "roas"])
+    va, vb = a[key], b[key]
+    if key in ("spend", "conversions", "revenue"):  # totals -> per-week averages so period lengths don't matter
+        va, vb = round(va / len(a["weeks_used"]), 2), round(vb / len(b["weeks_used"]), 2)
+    change = round(100 * (va - vb) / vb, 1) if vb else None
+    return {"value": va, "baseline": vb, "change_pct": change, "metric": metric, "weeks": weeks, "baseline_weeks": baseline_weeks}
+
+
 def check_target(metric: str, week: int, op: str, threshold: float, channel: str = "blended", exclude: list[list] = []) -> dict:
     if metric not in ("cpa", "revenue_usd") or op not in ("<", ">"):
         return {"error": "metric must be cpa|revenue_usd and op must be < or >", "valid": ["cpa", "revenue_usd", "<", ">"]}
-    kpi = compute_kpi(channel, [week], exclude)
+    kpi = compute_kpi(channel, [week], _ex(exclude))
     if "error" in kpi:
         return kpi
     value = kpi["cpa"] if metric == "cpa" else kpi["revenue"]
@@ -132,4 +157,32 @@ def scan_changes(metrics: list[str] = ["spend_usd", "conversions", "cpa"], z: fl
     return {"candidates": out}
 
 
-TOOLS = {f.__name__: f for f in (get_weekly, compute_kpi, scan_changes, compare_channels, check_target)}
+_S, _I = {"type": "string"}, {"type": "integer"}
+_CH = {**_S, "description": "a channel name, or 'blended' for all channels summed"}
+_WK = {"type": "array", "items": _I, "description": "week numbers"}
+_EX = {"type": "array", "description": "[channel, week] pairs to leave out, e.g. broken data",
+       "items": {"type": "array", "items": _S}}
+_MET = {"type": "array", "items": _S}
+
+
+def _obj(desc, props, required):
+    return {"description": desc, "parameters": {"type": "object", "properties": props, "required": required}}
+
+
+TOOLS = {  # name -> {fn, description, parameters}; the LLM only ever sees these specs
+    "get_weekly": {"fn": get_weekly, **_obj("Raw weekly rows per channel/week for chosen metrics.",
+                   {"channels": {"type": "array", "items": _S}, "weeks": _WK, "metrics": _MET}, [])},
+    "compute_kpi": {"fn": compute_kpi, **_obj("Spend, conversions, revenue, CPA, ROAS summed over weeks (optionally excluding channel-weeks).",
+                    {"channel": _CH, "weeks": _WK, "exclude": _EX}, ["channel", "weeks"])},
+    "scan_changes": {"fn": scan_changes, **_obj("Deterministic list of outlier weeks and level shifts per channel: where to look.",
+                     {"metrics": _MET, "z": {"type": "number"}}, [])},
+    "compare_channels": {"fn": compare_channels, **_obj("Ratio of a metric (default cpa) between two channels over weeks.",
+                         {"channel_a": _CH, "channel_b": _CH, "weeks": _WK, "metric": _S, "exclude": _EX},
+                         ["channel_a", "channel_b", "weeks"])},
+    "compare_periods": {"fn": compare_periods, **_obj("Change of a metric in `weeks` vs `baseline_weeks` (weekly averages for spend/conversions/revenue_usd; cpa and roas as ratios). Returns value, baseline, change_pct.",
+                        {"channel": _CH, "weeks": _WK, "baseline_weeks": _WK, "metric": _S, "exclude": _EX},
+                        ["channel", "weeks", "baseline_weeks", "metric"])},
+    "check_target": {"fn": check_target, **_obj("Does a week's cpa or revenue_usd meet a threshold (op '<' or '>')?",
+                     {"metric": _S, "week": _I, "op": _S, "threshold": {"type": "number"}, "channel": _CH, "exclude": _EX},
+                     ["metric", "week", "op", "threshold"])},
+}
