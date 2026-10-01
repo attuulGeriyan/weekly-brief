@@ -6,12 +6,14 @@ Reads `data/channel_weekly.csv` (12 weeks x 4 channels) and four team notes in `
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-printf 'GEMINI_API_KEY=...\nMODEL=gemini-2.5-flash\n' > .env        # .env is git-ignored
+cp .env.example .env                      # then put your Gemini key in .env (git-ignored)
 .venv/bin/python main.py                  # genuine run -> brief.md, trace.md, trace.json, trace.jsonl, state.json
 .venv/bin/python main.py --inject-error   # SEPARATE demo -> demo_invalid_draft/ (never touches the files above)
-.venv/bin/python render_trace.py [dir]    # re-render trace.md / trace.json and re-check the run
+.venv/bin/python render_trace.py          # re-render trace.md / trace.json and re-check the genuine run
 # options: --as-of-week N, --model NAME, --stop-after analyst1|analyst2|writer
 ```
+
+To re-render the demonstration's trace instead: `.venv/bin/python render_trace.py demo_invalid_draft`
 
 The committed `trace.md` is one genuine run: three writer attempts, two of them rejected by the reviewer for real reasons. `demo_invalid_draft/` corrupts the approved draft one dimension at a time (value, unit, channel, period, direction, metric), shows the reviewer reject each, then shows one corrupted draft go reject -> retry -> approve. It is labelled as a demonstration on every row.
 
@@ -59,4 +61,4 @@ Runs are not deterministic even at temperature 0; retries differ run to run, and
 
 ## How I used AI tools
 
-TODO(candidate): describe how you used AI tools while building this (what you delegated, what you checked or changed yourself, and what you can defend line by line).
+I used Claude Code to implement the Python pipeline and run it with Gemini. I used ChatGPT/Codex as a separate reviewer of the code, calculations, generated brief and traces. I set the scope, worked through the build in phases, and used the review findings to direct fixes. Those reviews identified issues with period comparisons, CPA aggregation, rounding, target coverage and reviewer validation. Most of the implementation and much of the verification were AI-assisted.
