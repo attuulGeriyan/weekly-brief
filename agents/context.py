@@ -1,4 +1,6 @@
 """Context agent: code proposes (finding, note) candidates; one LLM call confirms them and writes follow-ups."""
+import re
+
 from pydantic import BaseModel
 
 import llm
@@ -25,8 +27,9 @@ follow_ups are tool calls that compute what the note requires. Rules:
 - treat_as_invalid: recompute the finding's metric with the invalid channel-weeks left out (use the exclude argument).
 - evaluate_rule: compute the quantity the rule compares, over the weeks the note's window covers.
 - compare_to_target: one check_target call per distinct target in the note (each metric separately), for the latest week.
-- do_not_judge_on_metric: a call that gives a fairer view, e.g. the same period with the affected channel-weeks excluded; otherwise none.
+- do_not_judge_on_metric: none. The caveat itself is the output; do not invent a workaround.
 - context_only: none.
+"N weeks" in a note means N reporting records (rows of the data), not calendar weeks; week_start dates are irregular.
 Use ONLY these tools:
 {tools}
 Week numbers and their dates: {weeks}. Map the note's dates to week numbers with that table.
@@ -38,6 +41,35 @@ def _overlap(f: Finding, n: NoteMeta) -> bool:
     """Do the finding's weeks overlap the note's date window? (None dates are open-ended.)"""
     lo, hi = n.date_from or "0000", n.date_to or "9999"
     return any(tools.week_window(w)[0] <= hi and tools.week_window(w)[1] >= lo for w in f.weeks)
+
+
+def _ints(v):
+    """LLMs send weeks as 12, "7, 8, 9" or [7, 8, 9]; return a list of ints."""
+    if isinstance(v, (int, str)):
+        v = re.findall(r"\d+", str(v))
+    return [int(x) for x in v]
+
+
+def _coerce(args: dict) -> dict:
+    """Repair argument types the tools require (lists of ints, [channel, week] pairs, numbers)."""
+    out = dict(args)
+    for key in ("weeks", "baseline_weeks"):
+        if key in out:
+            out[key] = _ints(out[key])
+    if "week" in out:
+        out["week"] = _ints(out["week"])[0]
+    if "threshold" in out:
+        out["threshold"] = float(out["threshold"])
+    if isinstance(out.get("exclude"), str):  # "google_search, 6" -> [["google_search", 6]]
+        out["exclude"] = [[c, int(w)] for c, w in re.findall(r"([a-z_]+)\W+(\d+)", out["exclude"])]
+    return out
+
+
+def affected_records(note: NoteMeta) -> list[list]:
+    """[channel, week] pairs whose 7-day window overlaps the note's dates (the weekly data can't isolate the days)."""
+    chans = tools.CHANNELS if "blended" in note.channels else note.channels
+    lo, hi = note.date_from or "0000", note.date_to or "9999"
+    return [[c, w] for c in chans for w in tools.WEEKS if tools.week_window(w)[0] <= hi and tools.week_window(w)[1] >= lo]
 
 
 def candidates(state: RunState) -> list[tuple[str, str]]:
@@ -72,7 +104,29 @@ def run(state: RunState) -> list[Attachment]:
         if (a.finding_id, a.note_id) not in pairs:
             emit("warning", detail=f"dropped non-candidate pair {a.finding_id}->{a.note_id}")
             continue
-        a.follow_ups = [fu for fu in a.follow_ups if fu.tool in tools.TOOLS]
+        note = notes[a.note_id]
+        if a.implication in ("context_only", "do_not_judge_on_metric"):
+            a.follow_ups = []  # the caveat is the output; no workaround numbers
+        bad = affected_records(note) if a.implication == "treat_as_invalid" else []
+        if bad:
+            a.relevance += f" Note window {note.date_from}..{note.date_to} overlaps records {bad}; the weekly data cannot isolate the affected days."
+        kept = []
+        for fu in a.follow_ups:
+            if fu.tool not in tools.TOOLS:
+                emit("followup_rejected", finding_id=a.finding_id, tool=fu.tool, reason="unknown tool")
+                continue
+            try:
+                fu.args = _coerce(fu.args)
+                if bad and "exclude" in tools.TOOLS[fu.tool]["parameters"]["properties"]:
+                    fu.args["exclude"] = [e for e in bad if fu.args.get("channel", e[0]) in ("blended", e[0])]
+                check = tools.TOOLS[fu.tool]["fn"](**fu.args)  # dry run: reject requests the tool cannot answer
+            except (TypeError, ValueError, KeyError) as e:
+                check = {"error": f"{type(e).__name__}: {e}"}
+            if "error" in check:
+                emit("followup_rejected", finding_id=a.finding_id, tool=fu.tool, args=fu.args, reason=check["error"])
+            else:
+                kept.append(fu)
+        a.follow_ups = kept
         emit("attachment", **a.model_dump())
         attachments.append(a)
     return attachments

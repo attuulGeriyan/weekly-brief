@@ -8,3 +8,12 @@
 - A failed required agent raises; the orchestrator logs `agent_error` plus `done: failed` and exits non-zero (no partial runs). Pass 2 is skipped only when context produced no follow-ups.
 - Context candidates: finding channel matches note channel (or either is blended) AND finding weeks overlap the note's date window (a week = 7 days from week_start); target notes are always offered for blended/summary findings.
 - Known gap: the context LLM sometimes emits tool args as strings (e.g. weeks "7, 8, 9"); the pass-2 analyst repairs them when running the call. Not fixed in code.
+- Data-quality notes: code (not the LLM) computes every record whose 7-day window overlaps the note's dates (Aug 7-13 -> weeks 5 and 6), adds them to the attachment and to follow-up `exclude`; results are "excluding affected records" sensitivities, never "corrected" values. The writer must flag both records as uncertain.
+- Context validates follow-ups before handoff: argument types are coerced, then each call is dry-run against the real tool and dropped (trace `followup_rejected`) if the tool returns an error, e.g. excluding a finding's only row.
+- `do_not_judge_on_metric` and `context_only` attachments get no follow-ups (enforced in code); the brand note cannot be measured because brand spend is not separated from Meta's other spend.
+- "Six weeks" in the TikTok note = six reporting records (weeks 7-12); week_start dates are irregularly spaced (to repeat in the README assumptions).
+- Data-quality notes: code (not the LLM) computes every record whose 7-day window overlaps the note's dates (Aug 7-13 -> weeks 5 and 6), adds them to the attachment and to follow-up `exclude`; results are "excluding affected records" sensitivities, never "corrected" values. The writer must flag both records as uncertain.
+- Context validates follow-ups before handoff: argument types are coerced, then each call is dry-run against the real tool and dropped (trace `followup_rejected`) if the tool returns an error, e.g. excluding a finding's only row.
+- `do_not_judge_on_metric` and `context_only` attachments get no follow-ups (enforced in code); the brand note cannot be measured because brand spend is not separated from Meta's other spend.
+- "Six weeks" in the TikTok note = six reporting records (weeks 7-12); week_start dates are irregularly spaced (to repeat in the README assumptions).
+- Analyst pass 2 must answer every validated follow-up (keyed by tool + channel/metric) before its submission is accepted; otherwise the harness returns the missing list.

@@ -51,6 +51,7 @@ PASS2 = """Context from the team notes now tells us what else to compute. For ea
 (you may adjust args, for example a fuller week range, but keep the intent), then submit one finding per follow-up result.
 Set derived_from to the first finding id listed for the item. Use kind "test" for decision-rule evaluations
 and "target" for target checks. Leave baseline null unless a tool result gives one. Statements: numbers only, no interpretation.
+When a call excludes data records, say "excluding records ..." in the statement; never call such a number corrected or true.
 
 {items}"""
 
@@ -68,6 +69,13 @@ def _task(state: RunState, pass_no: int) -> str:
     items = [f"- findings {g['findings']} / notes {sorted(set(g['notes']))} ({', '.join(sorted(set(g['impl'])))}): "
              f"{g['fu'].tool}({g['fu'].args}) because {g['fu'].why}" for g in groups.values()]
     return PASS2.format(items="\n".join(items))
+
+
+def _key(tool: str, args: dict) -> tuple:
+    """Which question a call answers (tool + channel/metric), so pass 2 can check every follow-up was answered."""
+    ids = {"check_target": ("metric", "channel"), "compare_channels": ("channel_a", "channel_b", "metric")}.get(tool, ("channel",))
+    defaults = {"channel": "blended", "metric": "cpa"}
+    return (tool,) + tuple(args.get(k, defaults.get(k)) for k in ids)
 
 
 def run(state: RunState, pass_no: int = 1) -> list[Finding]:
@@ -101,6 +109,11 @@ def run(state: RunState, pass_no: int = 1) -> list[Finding]:
             c = calls[d.call_id]
             if problem := facts.check_finding(d.model_dump(), c["tool"], c["args"], c["result"]):
                 return {"error": f"finding {i}: {problem}"}
+        if pass_no == 2:  # every validated follow-up must be answered by at least one finding
+            need = {_key(fu.tool, fu.args) for a in state.attachments for fu in a.follow_ups}
+            got = {_key(calls[d.call_id]["tool"], calls[d.call_id]["args"]) for d in sub.findings}
+            if need - got:
+                return {"error": f"no finding yet for these follow-ups (run them and add findings): {sorted(need - got)}"}
         accepted[:] = [d.model_dump() for d in sub.findings]
         return {"ok": True, "accepted": len(accepted)}
 
