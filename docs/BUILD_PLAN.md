@@ -3,8 +3,8 @@
 At each checkpoint, run the check, show the output, commit, and give a 3-line summary. If a phase runs more than 10 minutes over its estimate, take the cut listed for it and move on.
 
 ## Phase 0: setup (5 min)
-`git init`, venv, `pip install -r requirements.txt`, then confirm `ANTHROPIC_API_KEY` is set and one tiny API call works.
-**Check:** `python -c "import anthropic,pandas,pydantic; print('ok')"`
+`git init`, venv, `pip install -r requirements.txt`, then confirm `GEMINI_API_KEY` is set, list models with `client.models.list()`, and make one tiny test call with the chosen `MODEL`.
+**Check:** `python -c "import openai,pandas,pydantic; print('ok')"`
 
 ## Phase 1: state and tools (20 min)
 Build `state.py` and `tools.py` as specified in SPEC, plus `trace.py` (`log()` only).

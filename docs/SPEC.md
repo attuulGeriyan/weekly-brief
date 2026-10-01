@@ -16,6 +16,7 @@ index_notes → analyst(pass 1: raw) → context → analyst(pass 2: follow-ups)
                                                                          brief.md, trace.jsonl, trace.md
 ```
 - If retries run out, the last draft is still written, with a top line: `> ⚠ Reviewer did not approve: <issues>`. Never fail silently.
+- Model: env `MODEL` (Gemini, via `openai` SDK + `GEMINI_API_KEY`), temperature 0; provider code isolated in `llm.py`.
 - CLI: `python main.py [--as-of-week 12] [--inject-error] [--model ...]`
 - `--inject-error`: after the first writer draft, the orchestrator multiplies the first `[F#]`-cited number by 1.3 and logs a `fault_injected` trace event. This proves the review loop rejects bad drafts and recovers. Use it for the submitted trace, and say so in the README.
 
@@ -98,7 +99,7 @@ Every tool validates its inputs (unknown channel or week → `{"error": ..., "va
 
 **index_notes** (LLM, structured output): for each note file, extract `NoteMeta`. Give it the list of valid channel names and the data's date range so it maps "Google Ads" to `google_search`, "the week of Aug 15" to a date, and so on.
 
-**analyst**: an LLM with the tools above, using an Anthropic tool-use loop of at most 8 steps.
+**analyst**: an LLM with the tools above, using an OpenAI-format function-calling loop (Gemini via its OpenAI-compatible endpoint) of at most 8 steps.
 - *Pass 1*: it sees only the data schema, `as_of_week`, and `scan_changes` output on request. **It does not see the notes.** Goal: 5–8 findings covering the latest week vs the period, notable anomalies, trend breaks, and blended totals. It returns `list[Finding]` via a final `submit_findings` tool call. Each finding's `evidence` is taken from an actual tool call made in the loop. The harness fills `evidence` from the recorded call, so the model can't invent it.
 - *Pass 2*: it gets the attachments' `follow_ups`. It runs each one (it may adjust args, e.g. a fuller week range) and submits pass-2 findings with `derived_from` set. This is where "exclude the broken week", "evaluate the test rule" and "check targets" become numbers.
 

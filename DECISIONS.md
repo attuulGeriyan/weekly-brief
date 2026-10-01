@@ -1,0 +1,1 @@
+- Switched to Gemini via OpenAI-compatible API because the provided key is Gemini; provider isolated in llm.py.
