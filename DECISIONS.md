@@ -17,3 +17,10 @@
 - `do_not_judge_on_metric` and `context_only` attachments get no follow-ups (enforced in code); the brand note cannot be measured because brand spend is not separated from Meta's other spend.
 - "Six weeks" in the TikTok note = six reporting records (weeks 7-12); week_start dates are irregularly spaced (to repeat in the README assumptions).
 - Analyst pass 2 must answer every validated follow-up (keyed by tool + channel/metric) before its submission is accepted; otherwise the harness returns the missing list.
+- Reviewer length rule is 200-400 words of the rendered brief (BUILD_PLAN/ASSIGNMENT range) instead of SPEC's 150-450 on the draft, so an approved draft always yields a brief in range.
+- `--inject-error` is a SEPARATE labelled demonstration (see demo.py): it never alters the genuine run, which always asks the writer for its first draft. Genuine output: brief.md, trace.jsonl, state.json; demo output: demo_invalid_draft/.
+- A tag may follow its number after up to 4 plain words ("12.7% higher [F3]"); digits or punctuation between them break the link.
+- Reviewer checks per cited number: value (within displayed rounding), unit, metric word, channel name, week mentions, direction words, against the finding's own fields plus facts of its evidence call; week mentions may also be the start/end week of a span, an excluded record, or a week the cited note's window covers.
+- Week mentions in a draft are parsed by `citations.week_mentions` ("week 12", "weeks 7-12", "weeks 5 and 6", "weeks 7, 8, 9"); a value must be placed in its own weeks, only a baseline may name the baseline weeks, and a lone start/end week of the finding's span or a cited note's window is allowed ("from week 7").
+- Pass-1 analyst is told every channel flagged by scan_changes must appear in at least one finding (generic wording), so a note about a channel always has a finding to attach to.
+- Known limits of the reviewer (next-day work): it works by sentence/clause proximity and keyword lists (metric words, channel names, higher/lower), so unusual phrasing can be rejected unfairly or, rarely, slip through; direction is not checked for target findings.

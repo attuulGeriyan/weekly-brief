@@ -1,0 +1,1995 @@
+{
+ "run_id": "20261001-141537",
+ "as_of_week": 12,
+ "model": "gemini-2.5-flash",
+ "notes": [
+  {
+   "note_id": "note_01_tracking",
+   "text": "Heads up: the Google Ads conversion tag broke on Aug 7 after the site redeploy. Fixed on Aug 13. Conversions reported for that window are not real — don't read anything into them.\n— Priya, Web",
+   "channels": [
+    "google_search"
+   ],
+   "date_from": "2026-08-07",
+   "date_to": "2026-08-13",
+   "kind": "data_quality",
+   "rule": null
+  },
+  {
+   "note_id": "note_02_tiktok",
+   "text": "We 1.6x'd TikTok budget from the week of Aug 15 to test whether it scales. Agreed with finance that we'd evaluate after 6 weeks and cut if TikTok CPA is more than 1.5x Meta's CPA over the test period.\n— Dan, Growth",
+   "channels": [
+    "tiktok"
+   ],
+   "date_from": "2026-08-15",
+   "date_to": "2026-09-28",
+   "kind": "experiment",
+   "rule": "cut if cpa(tiktok)/cpa(meta) > 1.5 over the test period"
+  },
+  {
+   "note_id": "note_03_brand",
+   "text": "Brand awareness campaign went live on Meta the week of Sep 1. It's upper-funnel: expect spend to jump and last-click conversions to look worse for a while. Don't judge it on direct CPA.\n— Maya, Brand",
+   "channels": [
+    "meta"
+   ],
+   "date_from": "2026-09-01",
+   "date_to": "2026-09-07",
+   "kind": "campaign_change",
+   "rule": "do not evaluate based on direct CPA"
+  },
+  {
+   "note_id": "note_04_targets",
+   "text": "Q3 targets: blended CPA under $65, and weekly revenue above $25k by the end of September.\n— Leadership",
+   "channels": [
+    "blended"
+   ],
+   "date_from": "2026-07-01",
+   "date_to": "2026-09-30",
+   "kind": "target",
+   "rule": "cpa('blended') < 65 and weekly_revenue > 25000 by 2026-09-30"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "pass_no": 1,
+   "kind": "summary",
+   "channel": "blended",
+   "weeks": [
+    12
+   ],
+   "metric": "spend_usd",
+   "value": 23030.0,
+   "baseline": 20785.27,
+   "change_pct": 10.8,
+   "statement": "Blended spend_usd in week 12 was 23030.0, which is 10.8% higher than the baseline of 20785.27 from weeks 1-11.",
+   "evidence": {
+    "tool": "compare_periods",
+    "args": {
+     "weeks": [
+      12
+     ],
+     "channel": "blended",
+     "metric": "spend_usd",
+     "baseline_weeks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+     ]
+    },
+    "result": {
+     "value": 23030.0,
+     "baseline": 20785.27,
+     "change_pct": 10.8,
+     "metric": "spend_usd",
+     "weeks": [
+      12
+     ],
+     "baseline_weeks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+     ]
+    }
+   },
+   "derived_from": null
+  },
+  {
+   "id": "F2",
+   "pass_no": 1,
+   "kind": "summary",
+   "channel": "blended",
+   "weeks": [
+    12
+   ],
+   "metric": "cpa",
+   "value": 79.97,
+   "baseline": 70.94,
+   "change_pct": 12.7,
+   "statement": "Blended cpa in week 12 was 79.97, which is 12.7% higher than the baseline of 70.94 from weeks 1-11.",
+   "evidence": {
+    "tool": "compare_periods",
+    "args": {
+     "channel": "blended",
+     "baseline_weeks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+     ],
+     "metric": "cpa",
+     "weeks": [
+      12
+     ]
+    },
+    "result": {
+     "value": 79.97,
+     "baseline": 70.94,
+     "change_pct": 12.7,
+     "metric": "cpa",
+     "weeks": [
+      12
+     ],
+     "baseline_weeks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+     ]
+    }
+   },
+   "derived_from": null
+  },
+  {
+   "id": "F3",
+   "pass_no": 1,
+   "kind": "summary",
+   "channel": "blended",
+   "weeks": [
+    12
+   ],
+   "metric": "roas",
+   "value": 0.78,
+   "baseline": 0.87,
+   "change_pct": -10.3,
+   "statement": "Blended roas in week 12 was 0.78, which is -10.3% lower than the baseline of 0.87 from weeks 1-11.",
+   "evidence": {
+    "tool": "compare_periods",
+    "args": {
+     "channel": "blended",
+     "weeks": [
+      12
+     ],
+     "metric": "roas",
+     "baseline_weeks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+     ]
+    },
+    "result": {
+     "value": 0.78,
+     "baseline": 0.87,
+     "change_pct": -10.3,
+     "metric": "roas",
+     "weeks": [
+      12
+     ],
+     "baseline_weeks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+     ]
+    }
+   },
+   "derived_from": null
+  },
+  {
+   "id": "F4",
+   "pass_no": 1,
+   "kind": "anomaly",
+   "channel": "google_search",
+   "weeks": [
+    6
+   ],
+   "metric": "cpa",
+   "value": 202.9,
+   "baseline": 62.99,
+   "change_pct": 222.1,
+   "statement": "Google Search cpa in week 6 was 202.9, which is 222.1% higher than the baseline of 62.99.",
+   "evidence": {
+    "tool": "scan_changes",
+    "args": {},
+    "result": {
+     "candidates": [
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "cpa",
+       "value": 202.9,
+       "baseline": 62.99,
+       "change_pct": 222.1,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "conversions",
+       "value": 42.0,
+       "baseline": 145.0,
+       "change_pct": -71.0,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 4787.83,
+       "baseline": 2872.33,
+       "change_pct": 66.7,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7
+       ],
+       "metric": "cpa",
+       "value": 202.83,
+       "baseline": 124.74,
+       "change_pct": 62.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "cpa",
+       "value": 162.44,
+       "baseline": 107.18,
+       "change_pct": 51.6,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        12
+       ],
+       "metric": "conversions",
+       "value": 43.0,
+       "baseline": 28.5,
+       "change_pct": 50.9,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        9
+       ],
+       "metric": "cpa",
+       "value": 188.0,
+       "baseline": 124.74,
+       "change_pct": 50.7,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "cpa",
+       "value": 85.52,
+       "baseline": 59.19,
+       "change_pct": 44.5,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8
+       ],
+       "metric": "conversions",
+       "value": 130.0,
+       "baseline": 90.5,
+       "change_pct": 43.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        8
+       ],
+       "metric": "cpa",
+       "value": 23.25,
+       "baseline": 17.14,
+       "change_pct": 35.7,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 36.0,
+       "baseline": 26.89,
+       "change_pct": 33.9,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        1
+       ],
+       "metric": "conversions",
+       "value": 19.0,
+       "baseline": 28.5,
+       "change_pct": -33.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8
+       ],
+       "metric": "cpa",
+       "value": 57.28,
+       "baseline": 82.13,
+       "change_pct": -30.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        8
+       ],
+       "metric": "conversions",
+       "value": 20.0,
+       "baseline": 28.5,
+       "change_pct": -29.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 37.0,
+       "baseline": 28.5,
+       "change_pct": 29.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 116.0,
+       "baseline": 90.5,
+       "change_pct": 28.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 8935.5,
+       "baseline": 7040.38,
+       "change_pct": 26.9,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 36.0,
+       "baseline": 28.5,
+       "change_pct": 26.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        10
+       ],
+       "metric": "spend_usd",
+       "value": 9212.0,
+       "baseline": 7324.5,
+       "change_pct": 25.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 107.0,
+       "baseline": 87.0,
+       "change_pct": 23.0,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9
+       ],
+       "metric": "cpa",
+       "value": 100.53,
+       "baseline": 82.13,
+       "change_pct": 22.4,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 8947.0,
+       "baseline": 7324.5,
+       "change_pct": 22.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 125.86,
+       "baseline": 159.0,
+       "change_pct": -20.8,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9
+       ],
+       "metric": "spend_usd",
+       "value": 8847.0,
+       "baseline": 7324.5,
+       "change_pct": 20.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 8736.0,
+       "baseline": 7324.5,
+       "change_pct": 19.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 536.0,
+       "baseline": 492.5,
+       "change_pct": 8.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        4
+       ],
+       "metric": "spend_usd",
+       "value": 530.0,
+       "baseline": 492.5,
+       "change_pct": 7.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 528.0,
+       "baseline": 492.5,
+       "change_pct": 7.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        6
+       ],
+       "metric": "spend_usd",
+       "value": 526.0,
+       "baseline": 492.5,
+       "change_pct": 6.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 9523.0,
+       "baseline": 8986.5,
+       "change_pct": 6.0,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "spend_usd",
+       "value": 8522.0,
+       "baseline": 8986.5,
+       "change_pct": -5.2,
+       "type": "outlier"
+      }
+     ]
+    }
+   },
+   "derived_from": null
+  },
+  {
+   "id": "F5",
+   "pass_no": 1,
+   "kind": "trend",
+   "channel": "tiktok",
+   "weeks": [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "metric": "spend_usd",
+   "value": 4787.83,
+   "baseline": 2872.33,
+   "change_pct": 66.7,
+   "statement": "TikTok spend_usd in weeks 7-12 was 4787.83, which is 66.7% higher than the baseline of 2872.33.",
+   "evidence": {
+    "tool": "scan_changes",
+    "args": {},
+    "result": {
+     "candidates": [
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "cpa",
+       "value": 202.9,
+       "baseline": 62.99,
+       "change_pct": 222.1,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "conversions",
+       "value": 42.0,
+       "baseline": 145.0,
+       "change_pct": -71.0,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 4787.83,
+       "baseline": 2872.33,
+       "change_pct": 66.7,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7
+       ],
+       "metric": "cpa",
+       "value": 202.83,
+       "baseline": 124.74,
+       "change_pct": 62.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "cpa",
+       "value": 162.44,
+       "baseline": 107.18,
+       "change_pct": 51.6,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        12
+       ],
+       "metric": "conversions",
+       "value": 43.0,
+       "baseline": 28.5,
+       "change_pct": 50.9,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        9
+       ],
+       "metric": "cpa",
+       "value": 188.0,
+       "baseline": 124.74,
+       "change_pct": 50.7,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "cpa",
+       "value": 85.52,
+       "baseline": 59.19,
+       "change_pct": 44.5,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8
+       ],
+       "metric": "conversions",
+       "value": 130.0,
+       "baseline": 90.5,
+       "change_pct": 43.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        8
+       ],
+       "metric": "cpa",
+       "value": 23.25,
+       "baseline": 17.14,
+       "change_pct": 35.7,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 36.0,
+       "baseline": 26.89,
+       "change_pct": 33.9,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        1
+       ],
+       "metric": "conversions",
+       "value": 19.0,
+       "baseline": 28.5,
+       "change_pct": -33.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8
+       ],
+       "metric": "cpa",
+       "value": 57.28,
+       "baseline": 82.13,
+       "change_pct": -30.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        8
+       ],
+       "metric": "conversions",
+       "value": 20.0,
+       "baseline": 28.5,
+       "change_pct": -29.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 37.0,
+       "baseline": 28.5,
+       "change_pct": 29.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 116.0,
+       "baseline": 90.5,
+       "change_pct": 28.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 8935.5,
+       "baseline": 7040.38,
+       "change_pct": 26.9,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 36.0,
+       "baseline": 28.5,
+       "change_pct": 26.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        10
+       ],
+       "metric": "spend_usd",
+       "value": 9212.0,
+       "baseline": 7324.5,
+       "change_pct": 25.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 107.0,
+       "baseline": 87.0,
+       "change_pct": 23.0,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9
+       ],
+       "metric": "cpa",
+       "value": 100.53,
+       "baseline": 82.13,
+       "change_pct": 22.4,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 8947.0,
+       "baseline": 7324.5,
+       "change_pct": 22.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 125.86,
+       "baseline": 159.0,
+       "change_pct": -20.8,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9
+       ],
+       "metric": "spend_usd",
+       "value": 8847.0,
+       "baseline": 7324.5,
+       "change_pct": 20.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 8736.0,
+       "baseline": 7324.5,
+       "change_pct": 19.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 536.0,
+       "baseline": 492.5,
+       "change_pct": 8.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        4
+       ],
+       "metric": "spend_usd",
+       "value": 530.0,
+       "baseline": 492.5,
+       "change_pct": 7.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 528.0,
+       "baseline": 492.5,
+       "change_pct": 7.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        6
+       ],
+       "metric": "spend_usd",
+       "value": 526.0,
+       "baseline": 492.5,
+       "change_pct": 6.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 9523.0,
+       "baseline": 8986.5,
+       "change_pct": 6.0,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "spend_usd",
+       "value": 8522.0,
+       "baseline": 8986.5,
+       "change_pct": -5.2,
+       "type": "outlier"
+      }
+     ]
+    }
+   },
+   "derived_from": null
+  },
+  {
+   "id": "F6",
+   "pass_no": 1,
+   "kind": "trend",
+   "channel": "meta",
+   "weeks": [
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "metric": "conversions",
+   "value": 107.0,
+   "baseline": 87.0,
+   "change_pct": 23.0,
+   "statement": "Meta conversions in weeks 8-12 was 107.0, which is 23.0% higher than the baseline of 87.0.",
+   "evidence": {
+    "tool": "scan_changes",
+    "args": {},
+    "result": {
+     "candidates": [
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "cpa",
+       "value": 202.9,
+       "baseline": 62.99,
+       "change_pct": 222.1,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "conversions",
+       "value": 42.0,
+       "baseline": 145.0,
+       "change_pct": -71.0,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 4787.83,
+       "baseline": 2872.33,
+       "change_pct": 66.7,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7
+       ],
+       "metric": "cpa",
+       "value": 202.83,
+       "baseline": 124.74,
+       "change_pct": 62.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "cpa",
+       "value": 162.44,
+       "baseline": 107.18,
+       "change_pct": 51.6,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        12
+       ],
+       "metric": "conversions",
+       "value": 43.0,
+       "baseline": 28.5,
+       "change_pct": 50.9,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        9
+       ],
+       "metric": "cpa",
+       "value": 188.0,
+       "baseline": 124.74,
+       "change_pct": 50.7,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "cpa",
+       "value": 85.52,
+       "baseline": 59.19,
+       "change_pct": 44.5,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8
+       ],
+       "metric": "conversions",
+       "value": 130.0,
+       "baseline": 90.5,
+       "change_pct": 43.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        8
+       ],
+       "metric": "cpa",
+       "value": 23.25,
+       "baseline": 17.14,
+       "change_pct": 35.7,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 36.0,
+       "baseline": 26.89,
+       "change_pct": 33.9,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        1
+       ],
+       "metric": "conversions",
+       "value": 19.0,
+       "baseline": 28.5,
+       "change_pct": -33.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8
+       ],
+       "metric": "cpa",
+       "value": 57.28,
+       "baseline": 82.13,
+       "change_pct": -30.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        8
+       ],
+       "metric": "conversions",
+       "value": 20.0,
+       "baseline": 28.5,
+       "change_pct": -29.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 37.0,
+       "baseline": 28.5,
+       "change_pct": 29.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 116.0,
+       "baseline": 90.5,
+       "change_pct": 28.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 8935.5,
+       "baseline": 7040.38,
+       "change_pct": 26.9,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 36.0,
+       "baseline": 28.5,
+       "change_pct": 26.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        10
+       ],
+       "metric": "spend_usd",
+       "value": 9212.0,
+       "baseline": 7324.5,
+       "change_pct": 25.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 107.0,
+       "baseline": 87.0,
+       "change_pct": 23.0,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9
+       ],
+       "metric": "cpa",
+       "value": 100.53,
+       "baseline": 82.13,
+       "change_pct": 22.4,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 8947.0,
+       "baseline": 7324.5,
+       "change_pct": 22.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 125.86,
+       "baseline": 159.0,
+       "change_pct": -20.8,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9
+       ],
+       "metric": "spend_usd",
+       "value": 8847.0,
+       "baseline": 7324.5,
+       "change_pct": 20.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 8736.0,
+       "baseline": 7324.5,
+       "change_pct": 19.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 536.0,
+       "baseline": 492.5,
+       "change_pct": 8.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        4
+       ],
+       "metric": "spend_usd",
+       "value": 530.0,
+       "baseline": 492.5,
+       "change_pct": 7.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 528.0,
+       "baseline": 492.5,
+       "change_pct": 7.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        6
+       ],
+       "metric": "spend_usd",
+       "value": 526.0,
+       "baseline": 492.5,
+       "change_pct": 6.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 9523.0,
+       "baseline": 8986.5,
+       "change_pct": 6.0,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "spend_usd",
+       "value": 8522.0,
+       "baseline": 8986.5,
+       "change_pct": -5.2,
+       "type": "outlier"
+      }
+     ]
+    }
+   },
+   "derived_from": null
+  },
+  {
+   "id": "F7",
+   "pass_no": 1,
+   "kind": "anomaly",
+   "channel": "email",
+   "weeks": [
+    8
+   ],
+   "metric": "cpa",
+   "value": 23.25,
+   "baseline": 17.14,
+   "change_pct": 35.7,
+   "statement": "Email cpa in week 8 was 23.25, which is 35.7% higher than the baseline of 17.14.",
+   "evidence": {
+    "tool": "scan_changes",
+    "args": {},
+    "result": {
+     "candidates": [
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "cpa",
+       "value": 202.9,
+       "baseline": 62.99,
+       "change_pct": 222.1,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "conversions",
+       "value": 42.0,
+       "baseline": 145.0,
+       "change_pct": -71.0,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 4787.83,
+       "baseline": 2872.33,
+       "change_pct": 66.7,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7
+       ],
+       "metric": "cpa",
+       "value": 202.83,
+       "baseline": 124.74,
+       "change_pct": 62.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "cpa",
+       "value": 162.44,
+       "baseline": 107.18,
+       "change_pct": 51.6,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        12
+       ],
+       "metric": "conversions",
+       "value": 43.0,
+       "baseline": 28.5,
+       "change_pct": 50.9,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        9
+       ],
+       "metric": "cpa",
+       "value": 188.0,
+       "baseline": 124.74,
+       "change_pct": 50.7,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "cpa",
+       "value": 85.52,
+       "baseline": 59.19,
+       "change_pct": 44.5,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8
+       ],
+       "metric": "conversions",
+       "value": 130.0,
+       "baseline": 90.5,
+       "change_pct": 43.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        8
+       ],
+       "metric": "cpa",
+       "value": 23.25,
+       "baseline": 17.14,
+       "change_pct": 35.7,
+       "type": "outlier"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 36.0,
+       "baseline": 26.89,
+       "change_pct": 33.9,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        1
+       ],
+       "metric": "conversions",
+       "value": 19.0,
+       "baseline": 28.5,
+       "change_pct": -33.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8
+       ],
+       "metric": "cpa",
+       "value": 57.28,
+       "baseline": 82.13,
+       "change_pct": -30.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        8
+       ],
+       "metric": "conversions",
+       "value": 20.0,
+       "baseline": 28.5,
+       "change_pct": -29.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 37.0,
+       "baseline": 28.5,
+       "change_pct": 29.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 116.0,
+       "baseline": 90.5,
+       "change_pct": 28.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 8935.5,
+       "baseline": 7040.38,
+       "change_pct": 26.9,
+       "type": "level_shift"
+      },
+      {
+       "channel": "tiktok",
+       "weeks": [
+        11
+       ],
+       "metric": "conversions",
+       "value": 36.0,
+       "baseline": 28.5,
+       "change_pct": 26.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        10
+       ],
+       "metric": "spend_usd",
+       "value": 9212.0,
+       "baseline": 7324.5,
+       "change_pct": 25.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 107.0,
+       "baseline": 87.0,
+       "change_pct": 23.0,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9
+       ],
+       "metric": "cpa",
+       "value": 100.53,
+       "baseline": 82.13,
+       "change_pct": 22.4,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 8947.0,
+       "baseline": 7324.5,
+       "change_pct": 22.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+       ],
+       "metric": "conversions",
+       "value": 125.86,
+       "baseline": 159.0,
+       "change_pct": -20.8,
+       "type": "level_shift"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        9
+       ],
+       "metric": "spend_usd",
+       "value": 8847.0,
+       "baseline": 7324.5,
+       "change_pct": 20.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "meta",
+       "weeks": [
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 8736.0,
+       "baseline": 7324.5,
+       "change_pct": 19.3,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        12
+       ],
+       "metric": "spend_usd",
+       "value": 536.0,
+       "baseline": 492.5,
+       "change_pct": 8.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        4
+       ],
+       "metric": "spend_usd",
+       "value": 530.0,
+       "baseline": 492.5,
+       "change_pct": 7.6,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 528.0,
+       "baseline": 492.5,
+       "change_pct": 7.2,
+       "type": "outlier"
+      },
+      {
+       "channel": "email",
+       "weeks": [
+        6
+       ],
+       "metric": "spend_usd",
+       "value": 526.0,
+       "baseline": 492.5,
+       "change_pct": 6.8,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        11
+       ],
+       "metric": "spend_usd",
+       "value": 9523.0,
+       "baseline": 8986.5,
+       "change_pct": 6.0,
+       "type": "outlier"
+      },
+      {
+       "channel": "google_search",
+       "weeks": [
+        6
+       ],
+       "metric": "spend_usd",
+       "value": 8522.0,
+       "baseline": 8986.5,
+       "change_pct": -5.2,
+       "type": "outlier"
+      }
+     ]
+    }
+   },
+   "derived_from": null
+  },
+  {
+   "id": "F8",
+   "pass_no": 2,
+   "kind": "target",
+   "channel": "blended",
+   "weeks": [
+    12
+   ],
+   "metric": "cpa",
+   "value": 79.97,
+   "baseline": null,
+   "change_pct": null,
+   "statement": "Blended CPA in week 12 was 79.97. The target was 65.0.",
+   "evidence": {
+    "tool": "check_target",
+    "args": {
+     "op": "<",
+     "week": 12,
+     "metric": "cpa",
+     "threshold": 65,
+     "channel": "blended"
+    },
+    "result": {
+     "value": 79.97,
+     "threshold": 65,
+     "met": false
+    }
+   },
+   "derived_from": "F2"
+  },
+  {
+   "id": "F9",
+   "pass_no": 2,
+   "kind": "test",
+   "channel": "tiktok",
+   "weeks": [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "metric": "ratio",
+   "value": 1.92,
+   "baseline": null,
+   "change_pct": null,
+   "statement": "The ratio of TikTok CPA to Meta CPA over weeks 7, 8, 9, 10, 11, 12 was 1.92.",
+   "evidence": {
+    "tool": "compare_channels",
+    "args": {
+     "metric": "cpa",
+     "weeks": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+     ],
+     "channel_b": "meta",
+     "channel_a": "tiktok"
+    },
+    "result": {
+     "a": 156.12,
+     "b": 81.42,
+     "ratio": 1.92,
+     "metric": "cpa"
+    }
+   },
+   "derived_from": "F5"
+  }
+ ],
+ "attachments": [
+  {
+   "finding_id": "F2",
+   "note_id": "note_04_targets",
+   "relevance": "The note sets a target for blended CPA, which is the metric of the finding.",
+   "implication": "compare_to_target",
+   "follow_ups": [
+    {
+     "tool": "check_target",
+     "args": {
+      "op": "<",
+      "metric": "cpa",
+      "channel": "blended",
+      "threshold": 65.0,
+      "week": 12
+     },
+     "why": "Check if blended CPA in week 12 meets the target of being under $65."
+    }
+   ]
+  },
+  {
+   "finding_id": "F4",
+   "note_id": "note_01_tracking",
+   "relevance": "The note states that Google Ads conversion data for week 6 is invalid, directly impacting the Google Search CPA finding for that week. The note's dates (2026-08-07 to 2026-08-13) overlap the weekly records for weeks 5, 6 (google_search); the weekly data cannot isolate the affected days, so every one of those records is uncertain.",
+   "implication": "treat_as_invalid",
+   "follow_ups": []
+  },
+  {
+   "finding_id": "F5",
+   "note_id": "note_02_tiktok",
+   "relevance": "The note describes a TikTok experiment and an evaluation rule that applies to the same channel and period as the finding.",
+   "implication": "evaluate_rule",
+   "follow_ups": [
+    {
+     "tool": "compare_channels",
+     "args": {
+      "channel_b": "meta",
+      "metric": "cpa",
+      "channel_a": "tiktok",
+      "weeks": [
+       7,
+       8,
+       9,
+       10,
+       11,
+       12
+      ]
+     },
+     "why": "Evaluate the rule by comparing TikTok CPA to Meta CPA over the 6-week test period (weeks 7-12)."
+    }
+   ]
+  },
+  {
+   "finding_id": "F6",
+   "note_id": "note_03_brand",
+   "relevance": "The note explains a brand awareness campaign on Meta during the finding's period and advises against judging on direct CPA, which is related to conversions.",
+   "implication": "do_not_judge_on_metric",
+   "follow_ups": []
+  }
+ ],
+ "drafts": [
+  "# Weekly Marketing Brief - Week 12\n\nOverall blended performance declined in the latest week, with CPA increasing and ROAS decreasing. We need to address the underperforming TikTok experiment and the blended CPA target miss.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030 [F1], 10.8% higher [F1] than the $20,785.27 [F1] baseline from weeks 1-11. Blended CPA in week 12 was $79.97 [F2], 12.7% higher [F2] than the $70.94 [F2] baseline. Blended ROAS in week 12 was 0.78x [F3], 10.3% lower [F3] than the 0.87x [F3] baseline.\n\n## What the numbers mean\nGoogle Search CPA in week 6 was $202.90 [F4], 222.1% higher [F4] than the $62.99 [F4] baseline. However, Google Ads conversion data for week 6 (Aug 7-13) is invalid due to a broken conversion tag [N1]; the weekly data cannot isolate the affected days, so this record is uncertain.\n\nTikTok spend in weeks 7-12 was $4,787.83 [F5], 66.7% higher [F5] than the $2,872.33 [F5] baseline, reflecting the 1.6x budget increase for the experiment [N2]. The evaluation rule for the TikTok experiment [N2] states that if TikTok CPA is more than 1.5x [N2] Meta's CPA over the test period, it should be cut. The ratio of TikTok CPA to Meta CPA over weeks 7-12 was 1.92x [F9], which is above the 1.5x [N2] threshold.\n\nMeta conversions in weeks 8-12 were 107 [F6], 23.0% higher [F6] than the 87 [F6] baseline. This period includes the brand awareness campaign that went live on Meta the week of Sep 1 [N3]; we should not judge it on direct CPA [N3].\n\nEmail CPA in week 8 was $23.25 [F7], 35.7% higher [F7] than the $17.14 [F7] baseline.\n\nBlended CPA in week 12 was $79.97 [F8], which did not meet the Q3 target of under $65 [N4].\n\n## Decisions needed\nDecision on the TikTok experiment based on the CPA ratio exceeding the threshold.\n\n## Recommended actions\n- Review TikTok campaign performance and consider budget adjustments or pausing the experiment, as its CPA ratio of 1.92x [F9] exceeds the 1.5x [N2] threshold.\n- Investigate the blended CPA increase in week 12 to identify contributing factors and develop a plan to meet the Q3 target of under $65 [N4].\n- Monitor Meta campaign performance, acknowledging the brand awareness campaign's impact on last-click conversions [N3].\n\n## Data caveats\nGoogle Ads conversion data for week 6 (Aug 7-13) is invalid due to a broken conversion tag [N1], affecting Google Search CPA for that week. The weekly data cannot isolate the affected days, making the record uncertain.",
+  "# Weekly Marketing Brief - Week 12\n\nOverall blended performance declined in the latest week, with CPA increasing and ROAS decreasing. We need to address the underperforming TikTok experiment and the blended CPA target miss.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030 [F1], 10.8% higher [F1] than the $20,785.27 [F1] baseline from weeks 1-11. Blended CPA in week 12 was $79.97 [F2], 12.7% higher [F2] than the $70.94 [F2] baseline from weeks 1-11. Blended ROAS in week 12 was 0.78x [F3], 10.3% lower [F3] than the 0.87x [F3] baseline from weeks 1-11.\n\n## What the numbers mean\nGoogle Search CPA in week 6 was $202.90 [F4], 222.1% higher [F4] than the $62.99 [F4] baseline. However, Google Ads conversion data for weeks 5 and 6 (Aug 7-13) is invalid due to a broken conversion tag [N1]; the weekly data cannot isolate the affected days, so every one of those records is uncertain.\n\nTikTok spend in weeks 7-12 was $4,787.83 [F5], 66.7% higher [F5] than the $2,872.33 [F5] baseline, reflecting the 1.6x [N2] budget increase for the experiment. The evaluation rule for the TikTok experiment [N2] states that if TikTok CPA is more than 1.5x [N2] Meta's CPA over the test period, it should be cut. The ratio of TikTok CPA to Meta CPA over weeks 7-12 was 1.92x [F9], which is above the 1.5x [N2] threshold.\n\nMeta conversions in weeks 8-12 were 107 [F6], 23.0% higher [F6] than the 87 [F6] baseline. This period includes the brand awareness campaign that went live on Meta the week of Sep 1 [N3]; do not judge it on direct CPA [N3].\n\nEmail CPA in week 8 was $23.25 [F7], 35.7% higher [F7] than the $17.14 [F7] baseline.\n\nBlended CPA in week 12 was $79.97 [F8], which did not meet the Q3 target of under $65 [N4].\n\n## Decisions needed\nDecision on the TikTok experiment based on the CPA ratio exceeding the threshold.\n\n## Recommended actions\n- Review TikTok campaign performance and consider budget adjustments or pausing the experiment, as its CPA ratio of 1.92x [F9] exceeds the 1.5x [N2] threshold.\n- Investigate the blended CPA increase in week 12 to identify contributing factors and develop a plan to meet the Q3 target of under $65 [N4].\n- Monitor Meta campaign performance, acknowledging the brand awareness campaign's impact on last-click conversions [N3].\n\n## Data caveats\nGoogle Ads conversion data for weeks 5 and 6 (Aug 7-13) is invalid due to a broken conversion tag [N1], affecting Google Search CPA for those weeks. The weekly data cannot isolate the affected days, making those records uncertain.",
+  "# Weekly Marketing Brief - Week 12\n\nOverall blended performance declined in the latest week, with CPA increasing and ROAS decreasing. We need to address the underperforming TikTok experiment and the blended CPA target miss.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030 [F1], 10.8% higher [F1] than the $20,785.27 [F1] baseline from weeks 1-11. Blended CPA in week 12 was $79.97 [F2], 12.7% higher [F2] than the $70.94 [F2] baseline from weeks 1-11. Blended ROAS in week 12 was 0.78x [F3], 10.3% lower [F3] than the 0.87x [F3] baseline from weeks 1-11.\n\n## What the numbers mean\nGoogle Search CPA in week 6 was $202.90 [F4], 222.1% higher [F4] than the $62.99 [F4] baseline. However, Google Ads conversion data for weeks 5 and 6 (Aug 7-13) is invalid due to a broken conversion tag [N1]; weekly data cannot isolate affected days, so these records are uncertain.\n\nTikTok spend in weeks 7-12 was $4,787.83 [F5], 66.7% higher [F5] than the $2,872.33 [F5] baseline, due to the 1.6x [N2] budget increase for the experiment. The TikTok CPA to Meta CPA ratio over weeks 7-12 was 1.92x [F9], exceeding the 1.5x [N2] cut-off threshold [N2].\n\nMeta conversions in weeks 8-12 were 107 [F6], 23.0% higher [F6] than the 87 [F6] baseline. This period includes a brand awareness campaign [N3]; do not judge it on direct CPA [N3].\n\nEmail CPA in week 8 was $23.25 [F7], 35.7% higher [F7] than the $17.14 [F7] baseline.\n\nBlended CPA in week 12 was $79.97 [F8], which did not meet the Q3 target of under $65 [N4].\n\n## Decisions needed\nDecision on the TikTok experiment based on the CPA ratio exceeding the threshold.\n\n## Recommended actions\n- Review TikTok campaign performance and consider adjusting budget or pausing the experiment, as its CPA ratio of 1.92x [F9] exceeds the 1.5x [N2] threshold for cutting [N2].\n- Investigate the blended CPA increase in week 12 to identify contributing factors and develop a plan to meet the Q3 target of under $65 [N4].\n- Monitor Meta campaign performance, acknowledging the brand awareness campaign's impact on last-click conversions [N3].\n\n## Data caveats\nGoogle Ads conversion data for weeks 5 and 6 (Aug 7-13) is invalid due to a broken conversion tag [N1], affecting Google Search CPA. Weekly data cannot isolate affected days, so those records are uncertain."
+ ],
+ "reviews": [
+  {
+   "verdict": "reject",
+   "issues": [
+    {
+     "kind": "uncited_number",
+     "detail": "'1.6x' in \"2.33 [F5] baseline, reflecting the 1.6x budget incr\" has no [F#]/[N#] citation - no finding has this number; remove it",
+     "expected": null,
+     "got": "1.6x"
+    },
+    {
+     "kind": "missing_note_caveat",
+     "detail": "note_01_tracking is used for ['F4'] but the paragraph citing it does not name affected record week(s) [5]",
+     "expected": null,
+     "got": null
+    }
+   ]
+  },
+  {
+   "verdict": "reject",
+   "issues": [
+    {
+     "kind": "length",
+     "detail": "406 words in the rendered brief; must be 200-400 (cut about 26 words)",
+     "expected": null,
+     "got": "406"
+    }
+   ]
+  },
+  {
+   "verdict": "approve",
+   "issues": []
+  }
+ ],
+ "attempts": 3,
+ "brief": "# Weekly Marketing Brief - Week 12\n\nOverall blended performance declined in the latest week, with CPA increasing and ROAS decreasing. We need to address the underperforming TikTok experiment and the blended CPA target miss.\n\n## Last week vs the period\nBlended spend in week 12 was $23,030, 10.8% higher than the $20,785.27 baseline from weeks 1-11. Blended CPA in week 12 was $79.97, 12.7% higher than the $70.94 baseline from weeks 1-11. Blended ROAS in week 12 was 0.78x, 10.3% lower than the 0.87x baseline from weeks 1-11.\n\n## What the numbers mean\nGoogle Search CPA in week 6 was $202.90, 222.1% higher than the $62.99 baseline. However, Google Ads conversion data for weeks 5 and 6 (Aug 7-13) is invalid due to a broken conversion tag (note_01_tracking); weekly data cannot isolate affected days, so these records are uncertain.\n\nTikTok spend in weeks 7-12 was $4,787.83, 66.7% higher than the $2,872.33 baseline, due to the 1.6x (note_02_tiktok) budget increase for the experiment. The TikTok CPA to Meta CPA ratio over weeks 7-12 was 1.92x, exceeding the 1.5x (note_02_tiktok) cut-off threshold (note_02_tiktok).\n\nMeta conversions in weeks 8-12 were 107, 23.0% higher than the 87 baseline. This period includes a brand awareness campaign (note_03_brand); do not judge it on direct CPA (note_03_brand).\n\nEmail CPA in week 8 was $23.25, 35.7% higher than the $17.14 baseline.\n\nBlended CPA in week 12 was $79.97, which did not meet the Q3 target of under $65 (note_04_targets).\n\n## Decisions needed\nDecision on the TikTok experiment based on the CPA ratio exceeding the threshold.\n\n## Recommended actions\n- Review TikTok campaign performance and consider adjusting budget or pausing the experiment, as its CPA ratio of 1.92x exceeds the 1.5x (note_02_tiktok) threshold for cutting (note_02_tiktok).\n- Investigate the blended CPA increase in week 12 to identify contributing factors and develop a plan to meet the Q3 target of under $65 (note_04_targets).\n- Monitor Meta campaign performance, acknowledging the brand awareness campaign's impact on last-click conversions (note_03_brand).\n\n## Data caveats\nGoogle Ads conversion data for weeks 5 and 6 (Aug 7-13) is invalid due to a broken conversion tag (note_01_tracking), affecting Google Search CPA. Weekly data cannot isolate affected days, so those records are uncertain.\n\n---\nSources: note_01_tracking, note_02_tiktok, note_03_brand, note_04_targets"
+}

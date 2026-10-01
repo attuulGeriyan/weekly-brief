@@ -101,8 +101,11 @@ def structured(system: str, user: str, schema, on_event=None):
     tool = {"name": "submit", "description": "Submit the result.", "parameters": schema}
     forced = {"type": "function", "function": {"name": "submit"}}
     messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
-    try:
-        msg = _chat(messages, [_spec(tool)], forced, emit)
-    except BadRequestError:  # fallback if the endpoint rejects a named tool_choice
-        msg = _chat(messages, [_spec(tool)], "required", emit)
-    return schema.model_validate_json(msg.tool_calls[0].function.arguments)
+    for attempt in range(5):  # Gemini sometimes returns an empty/malformed tool call: retry, then fail clearly
+        try:
+            msg = _chat(messages, [_spec(tool)], forced if attempt % 2 == 0 else "required", emit)
+        except BadRequestError:  # the endpoint may reject a named tool_choice; "required" with one tool is equivalent
+            msg = _chat(messages, [_spec(tool)], "required", emit)
+        if msg.tool_calls:
+            return schema.model_validate_json(msg.tool_calls[0].function.arguments)
+    raise RuntimeError("the model returned no tool call after 5 attempts")

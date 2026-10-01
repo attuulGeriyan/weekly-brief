@@ -43,6 +43,7 @@ Find 5-8 findings. You must include: (a) blended results for the latest week ver
 with weeks=[latest week] and baseline_weeks=the earlier weeks), and (b) the most important anomalies and
 sustained trend breaks, which may be about spend, conversions, revenue or CPA.
 Prefer compare_periods for period comparisons: it is like-for-like and returns value, baseline and change_pct.
+Make sure every channel that scan_changes flags appears in at least one finding.
 Start with scan_changes using its default metrics, then size things with the other tools. You may make several tool
 calls in one step. You have 8 steps, so call submit_findings by step 6 at the latest."""
 
@@ -51,7 +52,8 @@ PASS2 = """Context from the team notes now tells us what else to compute. For ea
 (you may adjust args, for example a fuller week range, but keep the intent), then submit one finding per follow-up result.
 Set derived_from to the first finding id listed for the item. Use kind "test" for decision-rule evaluations
 and "target" for target checks. Leave baseline null unless a tool result gives one. Statements: numbers only, no interpretation.
-When a call excludes data records, say "excluding records ..." in the statement; never call such a number corrected or true.
+When a call excludes data records, say so in plain words, e.g. "excluding the google_search records for weeks 5 and 6" (never a Python list);
+never call such a number corrected or true.
 
 {items}"""
 
@@ -110,10 +112,11 @@ def run(state: RunState, pass_no: int = 1) -> list[Finding]:
             if problem := facts.check_finding(d.model_dump(), c["tool"], c["args"], c["result"]):
                 return {"error": f"finding {i}: {problem}"}
         if pass_no == 2:  # every validated follow-up must be answered by at least one finding
-            need = {_key(fu.tool, fu.args) for a in state.attachments for fu in a.follow_ups}
+            need = {_key(fu.tool, fu.args): fu for a in state.attachments for fu in a.follow_ups}
             got = {_key(calls[d.call_id]["tool"], calls[d.call_id]["args"]) for d in sub.findings}
-            if need - got:
-                return {"error": f"no finding yet for these follow-ups (run them and add findings): {sorted(need - got)}"}
+            if missing := [fu for k, fu in need.items() if k not in got]:
+                todo = "; ".join(f"{fu.tool}({fu.args})" for fu in missing)
+                return {"error": f"not done yet. Call these tools first, then resubmit ALL findings including one for each: {todo}"}
         accepted[:] = [d.model_dump() for d in sub.findings]
         return {"ok": True, "accepted": len(accepted)}
 

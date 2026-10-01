@@ -109,7 +109,9 @@ def run(state: RunState) -> list[Attachment]:
             a.follow_ups = []  # the caveat is the output; no workaround numbers
         bad = affected_records(note) if a.implication == "treat_as_invalid" else []
         if bad:
-            a.relevance += f" Note window {note.date_from}..{note.date_to} overlaps records {bad}; the weekly data cannot isolate the affected days."
+            chans, wks = sorted({c for c, _ in bad}), sorted({w for _, w in bad})
+            a.relevance += (f" The note's dates ({note.date_from} to {note.date_to}) overlap the weekly records for weeks {', '.join(map(str, wks))}"
+                            f" ({', '.join(chans)}); the weekly data cannot isolate the affected days, so every one of those records is uncertain.")
         kept = []
         for fu in a.follow_ups:
             if fu.tool not in tools.TOOLS:
