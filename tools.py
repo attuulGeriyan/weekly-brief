@@ -1,9 +1,20 @@
 """Deterministic pandas tools over the channel CSV. They return dicts and never raise."""
+from datetime import date, timedelta
+
 import pandas as pd
 
 DF = pd.read_csv("data/channel_weekly.csv")
 CHANNELS = sorted(DF["channel"].unique())
 WEEKS = sorted(int(w) for w in DF["week"].unique())
+WEEK_START = dict(zip(DF["week"], DF["week_start"]))  # week_start dates are irregular, so always map via this
+
+
+def week_window(week: int) -> tuple[str, str]:
+    """ISO (first day, last day) covered by a week: 7 days from its week_start."""
+    start = date.fromisoformat(WEEK_START[week])
+    return WEEK_START[week], (start + timedelta(days=6)).isoformat()
+
+
 BASE = ["spend_usd", "impressions", "clicks", "conversions", "revenue_usd"]
 DERIVED = ["cpa", "roas", "ctr", "cvr"]
 KPI_ALIAS = {"spend_usd": "spend", "revenue_usd": "revenue"}  # compare_channels metric -> compute_kpi key

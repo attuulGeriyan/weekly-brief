@@ -87,7 +87,8 @@ def run_tool_loop(system: str, user: str, tools: list[dict], max_steps: int = 8,
                 result = by_name[name]["fn"](**args)
             except Exception as e:  # bad tool name or args: tell the model, don't crash
                 result = {"error": f"{type(e).__name__}: {e}"}
-            emit("tool_result", tool=name, result=json.dumps(result, default=str)[:500])
+            text = json.dumps(result, default=str)
+            emit("tool_result", tool=name, result=text[:500] + ("...[truncated]" if len(text) > 500 else ""), chars=len(text))
             messages.append({"role": "tool", "tool_call_id": call.id, "content": json.dumps(result, default=str)})
             if name == final and "error" not in result:
                 return {"final": result, "steps": step}

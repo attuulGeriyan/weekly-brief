@@ -3,3 +3,8 @@
 - Analyst's submit_findings is validated by the harness: evidence call must exist, `value` must appear in that call's result, baseline/change_pct and every number in the statement must appear in some tool result; otherwise the error goes back to the model.
 - run_tool_loop forces the final tool on the last step and gives 2 extra steps to fix a rejected submission; empty/MALFORMED Gemini replies are retried (max 4) without using a step, with the final tool forced.
 - index_notes is built in Phase 3 (BUILD_PLAN lists its file there), so Phase 2's main.py runs analyst pass 1 only.
+- Findings are validated by `facts.py`: the evidence call must support the same channel, weeks, metric, value, baseline, change_pct, and the statement's direction words and numbers; the reviewer will reuse it.
+- Trace: `tool_result` is truncated to 500 chars but carries `chars`; each accepted finding gets a full `finding_recorded` event; `submit_findings` returns a compact ack so drafts are never cut off.
+- A failed required agent raises; the orchestrator logs `agent_error` plus `done: failed` and exits non-zero (no partial runs). Pass 2 is skipped only when context produced no follow-ups.
+- Context candidates: finding channel matches note channel (or either is blended) AND finding weeks overlap the note's date window (a week = 7 days from week_start); target notes are always offered for blended/summary findings.
+- Known gap: the context LLM sometimes emits tool args as strings (e.g. weeks "7, 8, 9"); the pass-2 analyst repairs them when running the call. Not fixed in code.
